@@ -10,10 +10,9 @@ class CipherDashboard {
         this.isRunning = false;
         this.eventSource = null;
         this.agentOutputs = { agent1: '', agent2: '', agent3: '' };
-        this.currentOutputBlock = null;
         this.currentFullOutputTab = 'observations';
         this.phaseEnded = { agent1: false, agent2: false, agent3: false };
-        this.logCount = 0;
+        this.agentThinkingCount = { agent1: 0, agent2: 0, agent3: 0 };
         
         this.AGENT_NAMES = {
             'agent1': 'Observations',
@@ -25,6 +24,39 @@ class CipherDashboard {
             'agent1': 'observations',
             'agent2': 'threats',
             'agent3': 'scenarios'
+        };
+
+        this.THINKING_MESSAGES = {
+            'agent1': [
+                'Examining system telemetry data structure...',
+                'Analyzing CPU metrics and usage patterns...',
+                'Reviewing memory allocation across processes...',
+                'Scanning for unusual network activity...',
+                'Cross-referencing process list with known patterns...',
+                'Identifying potential anomalies in system state...',
+                'Compiling factual observations from telemetry...',
+                'Preparing structured analysis report...'
+            ],
+            'agent2': [
+                'Reviewing observations from telemetry analysis...',
+                'Mapping identified patterns to potential attack vectors...',
+                'Evaluating network connections for suspicious activity...',
+                'Assessing process vulnerabilities and exposures...',
+                'Correlating data points to attack surface...',
+                'Generating hypothetical attack scenarios...',
+                'Applying MITRE ATT&CK framework mapping...',
+                'Documenting threat intelligence findings...'
+            ],
+            'agent3': [
+                'Synthesizing threat intelligence into defensive scenarios...',
+                'Constructing MITRE ATT&CK aligned attack chains...',
+                'Defining detection requirements for each phase...',
+                'Mapping attack progression from initial access to impact...',
+                'Identifying telemetry gaps in current coverage...',
+                'Generating tabletop exercise narrative...',
+                'Developing detection rule recommendations...',
+                'Finalizing defensive scenario documentation...'
+            ]
         };
 
         this.init();
@@ -87,6 +119,13 @@ class CipherDashboard {
     getTimestamp() {
         const now = new Date();
         return now.toLocaleTimeString('en-US', { hour12: false });
+    }
+
+    getNextThinkingMessage(agent) {
+        const messages = this.THINKING_MESSAGES[agent] || [];
+        const idx = this.agentThinkingCount[agent] % messages.length;
+        this.agentThinkingCount[agent]++;
+        return messages[idx];
     }
 
     async execute() {
@@ -160,18 +199,18 @@ class CipherDashboard {
             }
         } else if (phase === 'agent1' && status === 'starting') {
             this.updateStep(2, 'active');
-            this.logSection('AGENT 1: OBSERVATIONS', 'observations');
-            this.log('info', 'Observations', 'Analyzing system telemetry...');
+            this.logSection('OBSERVATION AGENT', 'observations');
+            this.log('info', 'System', 'Observation Agent is starting analysis of system telemetry...');
         } else if (phase === 'agent2' && status === 'starting') {
             this.updateStep(2, 'complete');
             this.updateStep(3, 'active');
-            this.logSection('AGENT 2: THREATS', 'threats');
-            this.log('info', 'Threats', 'Mapping attack surface based on observations...');
+            this.logSection('THREAT AGENT', 'threats');
+            this.log('info', 'System', 'Threat Agent is starting attack surface mapping...');
         } else if (phase === 'agent3' && status === 'starting') {
             this.updateStep(3, 'complete');
             this.updateStep(4, 'active');
-            this.logSection('AGENT 3: SCENARIOS', 'scenarios');
-            this.log('info', 'Scenarios', 'Generating MITRE ATT&CK defensive scenarios...');
+            this.logSection('SCENARIO AGENT', 'scenarios');
+            this.log('info', 'System', 'Scenario Agent is starting MITRE ATT&CK scenario generation...');
         } else if (phase === 'complete') {
             this.updateStep(4, 'complete');
         }
@@ -208,8 +247,8 @@ class CipherDashboard {
         const agentName = this.AGENT_NAMES[agent] || name || agent;
         const agentClass = this.AGENT_CLASSES[agent] || 'system';
 
-        this.log('info', 'System', `${agentName} agent initialized with instructions...`);
-        
+        this.log('info', 'System', `${agentName} Agent initialized with analysis directives.`);
+
         const block = document.createElement('div');
         block.className = 'log-block ' + agentClass;
         block.innerHTML = `
@@ -219,7 +258,7 @@ class CipherDashboard {
                 <span class="log-label">SYSTEM PROMPT</span>
             </div>
             <div class="log-content prompt-content">
-                <div class="prompt-description">Instructions given to DeepSeek AI:</div>
+                <div class="prompt-description">Analysis directives sent to DeepSeek AI:</div>
                 <pre class="prompt-text">${this.escapeHtml(prompt)}</pre>
             </div>
         `;
@@ -237,30 +276,13 @@ class CipherDashboard {
         if (!this.phaseEnded[agent]) {
             this.phaseEnded[agent] = true;
             
-            const block = document.createElement('div');
-            block.className = 'log-block ' + agentClass;
-            block.id = `agent-output-${agent}`;
-            block.innerHTML = `
-                <div class="log-header">
-                    <span class="log-timestamp">${this.getTimestamp()}</span>
-                    <span class="agent-badge ${agentClass}">${agentName}</span>
-                    <span class="log-label">LIVE RESPONSE</span>
-                    <span class="thinking-indicator">Thinking...</span>
-                </div>
-                <div class="log-content ai-response">
-                    <pre class="response-text">${this.escapeHtml(full_output)}</pre>
-                </div>
-            `;
-            this.commandLog.appendChild(block);
+            const thinkingMsg = this.getNextThinkingMessage(agent);
+            this.log('thinking', agentName, thinkingMsg);
         } else {
-            const block = document.getElementById(`agent-output-${agent}`);
-            if (block) {
-                const responseEl = block.querySelector('.response-text');
-                if (responseEl) {
-                    responseEl.textContent = full_output;
-                }
-                const thinkingEl = block.querySelector('.thinking-indicator');
-                if (thinkingEl) thinkingEl.style.display = 'none';
+            const msgCount = this.agentThinkingCount[agent];
+            if (msgCount > 0 && msgCount % 3 === 0) {
+                const thinkingMsg = this.getNextThinkingMessage(agent);
+                this.log('thinking', agentName, thinkingMsg);
             }
         }
 
@@ -282,7 +304,6 @@ class CipherDashboard {
     }
 
     logHeader(message, type) {
-        this.logCount++;
         const block = document.createElement('div');
         block.className = 'log-header-block ' + type;
         block.innerHTML = `
@@ -307,7 +328,6 @@ class CipherDashboard {
     }
 
     log(type, agent, message) {
-        this.logCount++;
         const block = document.createElement('div');
         block.className = 'log-entry ' + type;
         
@@ -335,6 +355,9 @@ class CipherDashboard {
                 break;
             case 'output':
                 icon = '<svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+                break;
+            case 'thinking':
+                icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><circle cx="12" cy="12" r="3"/></svg>';
                 break;
             case 'error':
                 icon = '<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
@@ -626,7 +649,7 @@ class CipherDashboard {
     }
 
     reset() {
-        this.logCount = 0;
+        this.agentThinkingCount = { agent1: 0, agent2: 0, agent3: 0 };
         this.phaseEnded = { agent1: false, agent2: false, agent3: false };
         this.commandLog.innerHTML = '';
 

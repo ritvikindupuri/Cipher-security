@@ -70,18 +70,19 @@
         .btn-secondary:hover { background: #ddd; }
 
         /* Main Layout */
-        .main { display: flex; flex: 1; overflow: hidden; }
+        .main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 
         /* Sidebar */
         .sidebar {
             width: 240px;
             background: var(--bg-secondary);
             border-right: 1px solid var(--border);
-            padding: 20px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
             overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .section-title {
@@ -166,12 +167,19 @@
         .step.complete .step-status { color: var(--success); }
 
         /* Content */
-        .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+        .content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            min-height: 0;
+            min-width: 0;
+        }
 
         .tabs {
             display: flex;
             gap: 4px;
-            padding: 16px 24px;
+            padding: 12px 16px;
             background: var(--bg);
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
@@ -703,34 +711,29 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            gap: 16px;
-            padding: 16px;
+            gap: 12px;
+            padding: 12px;
             background: var(--bg-secondary);
-            overflow-y: auto;
             flex: 1;
             min-height: 0;
-            height: 100%;
-            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .agent-output-card {
             background: var(--bg);
             border-radius: 12px;
             border: 1px solid var(--border);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 200px;
-            height: 100%;
+            overflow: hidden;
         }
 
         .agent-output-card.full {
             grid-column: span 2;
-            min-height: 150px;
         }
 
         .agent-output-header {
-            padding: 12px 14px;
+            padding: 10px 12px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -746,7 +749,6 @@
             padding: 12px;
             overflow-y: auto;
             flex: 1;
-            min-height: 0;
         }
 
         .scenario-table-container {
@@ -756,9 +758,9 @@
         .full-outputs-section {
             border-top: 1px solid var(--border);
             background: var(--bg);
-            padding: 16px;
+            padding: 12px;
             flex: 1;
-            min-height: 200px;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             overflow: hidden;
