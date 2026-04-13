@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentinel - Security Analysis</title>
+    <title>Scry - Reveal Hidden Threats</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -817,20 +817,24 @@
         <header class="header">
             <div class="logo">
                 <svg viewBox="0 0 32 32" fill="none">
-                    <!-- Shield outline -->
-                    <path d="M16 2L28 7V15C28 22 22 28 16 30C10 28 4 22 4 15V7L16 2Z" fill="#0071e3" stroke="#0071e3" stroke-width="1.5"/>
-                    <!-- Eye shape -->
-                    <ellipse cx="16" cy="15" rx="10" ry="6" fill="white" opacity="0.9"/>
-                    <ellipse cx="16" cy="15" rx="10" ry="6" stroke="#0071e3" stroke-width="1.5" fill="none"/>
-                    <!-- Pupil -->
-                    <circle cx="16" cy="15" r="3" fill="#0071e3"/>
-                    <!-- Eye highlight -->
-                    <circle cx="14" cy="13" r="1" fill="white"/>
-                    <!-- Scan lines on shield -->
-                    <line x1="6" y1="8" x2="10" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
-                    <line x1="26" y1="8" x2="22" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+                    <!-- Crystal ball base -->
+                    <ellipse cx="16" cy="27" rx="8" ry="2" fill="#0071e3" opacity="0.3"/>
+                    <!-- Main crystal circle -->
+                    <circle cx="16" cy="15" r="12" fill="#0071e3" opacity="0.1"/>
+                    <circle cx="16" cy="15" r="12" stroke="#0071e3" stroke-width="2" fill="none"/>
+                    <!-- Inner glow -->
+                    <circle cx="16" cy="15" r="8" stroke="#0071e3" stroke-width="1" opacity="0.5" stroke-dasharray="2 2"/>
+                    <!-- Eye/seeing symbol -->
+                    <ellipse cx="16" cy="15" rx="6" ry="4" stroke="#0071e3" stroke-width="1.5" fill="none"/>
+                    <circle cx="16" cy="15" r="2" fill="#0071e3"/>
+                    <!-- Mystical rays -->
+                    <line x1="16" y1="3" x2="16" y2="6" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="7" y1="8" x2="9" y2="10" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="25" y1="8" x2="23" y2="10" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"/>
+                    <!-- Base stand -->
+                    <path d="M12 25 L16 22 L20 25" stroke="#0071e3" stroke-width="2" fill="none" stroke-linecap="round"/>
                 </svg>
-                <span class="logo-name">Sentinel</span>
+                <span class="logo-name">Scry</span>
             </div>
             <div class="header-actions">
                 <button id="downloadBtn" class="btn btn-secondary" disabled>Download Report</button>
