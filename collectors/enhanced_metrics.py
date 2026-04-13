@@ -9,6 +9,7 @@ import json
 import platform
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from typing import Any, Callable
 from dataclasses import dataclass, field, asdict
@@ -17,6 +18,7 @@ import psutil
 
 MAX_PROCESSES = 50
 MAX_CONNECTIONS = 150
+COMMAND_DELAY = 0.4  # seconds between commands for readable output
 
 
 @dataclass
@@ -100,7 +102,6 @@ class LoggingCollector:
         timeout: int = 30
     ) -> subprocess.CompletedProcess:
         """Execute a command and log the result"""
-        import time
         start = time.time()
         cmd_str = " ".join(cmd)
         
@@ -160,6 +161,7 @@ class LoggingCollector:
                 "processor": uname.processor
             }, indent=2)
         )
+        time.sleep(COMMAND_DELAY)
         
         # Step 2: Boot Time
         self._log_command(
@@ -176,6 +178,7 @@ class LoggingCollector:
             "success",
             f"Boot time: {datetime.fromtimestamp(boot_time, tz=timezone.utc).isoformat()}"
         )
+        time.sleep(COMMAND_DELAY)
         
         # Step 3: CPU Info
         self._log_command(
@@ -192,6 +195,7 @@ class LoggingCollector:
             "success",
             f"CPU Usage: {cpu_percent}%"
         )
+        time.sleep(COMMAND_DELAY)
         
         self._log_command(
             "psutil.cpu_count()",
@@ -208,6 +212,7 @@ class LoggingCollector:
             "success",
             f"Logical CPUs: {logical_cpus}, Physical CPUs: {physical_cpus}"
         )
+        time.sleep(COMMAND_DELAY)
         
         # Step 4: Memory Info
         self._log_command(
@@ -224,6 +229,7 @@ class LoggingCollector:
             "success",
             f"Total: {vm.total / (1024**3):.2f} GB, Used: {vm.percent}%, Available: {vm.available / (1024**3):.2f} GB"
         )
+        time.sleep(COMMAND_DELAY)
         
         self._log_command(
             "psutil.swap_memory()",
@@ -239,6 +245,7 @@ class LoggingCollector:
             "success",
             f"Total: {swap.total / (1024**3):.2f} GB, Used: {swap.percent}%, Used bytes: {swap.used}"
         )
+        time.sleep(COMMAND_DELAY)
         
         # Step 5: Disk Info
         self._log_command(
@@ -255,6 +262,7 @@ class LoggingCollector:
             "success",
             f"Found {len(partitions)} partitions"
         )
+        time.sleep(COMMAND_DELAY)
         
         disk_info = []
         for part in partitions:
@@ -282,6 +290,7 @@ class LoggingCollector:
                     "success",
                     f"Used: {usage.used / (1024**3):.2f} GB / {usage.total / (1024**3):.2f} GB ({usage.percent}%)"
                 )
+                time.sleep(COMMAND_DELAY)
             except PermissionError as e:
                 self._log_command(
                     f"psutil.disk_usage('{part.mountpoint}')",
@@ -291,6 +300,7 @@ class LoggingCollector:
                     "",
                     str(e)
                 )
+                time.sleep(COMMAND_DELAY)
         
         # Step 6: Network I/O
         self._log_command(
@@ -307,6 +317,7 @@ class LoggingCollector:
             "success",
             f"Bytes sent: {net_io.bytes_sent}, Bytes received: {net_io.bytes_recv}"
         )
+        time.sleep(COMMAND_DELAY)
         
         # Step 7: Process List
         self._log_command(
@@ -348,6 +359,7 @@ class LoggingCollector:
             "success",
             f"Total processes found: {len(procs)}\nTop 10 by memory:\n{proc_summary}"
         )
+        time.sleep(COMMAND_DELAY)
         
         # Step 8: Network Connections
         self._log_command(
@@ -390,6 +402,7 @@ class LoggingCollector:
             "success",
             f"Total connections: {len(conns)}\n" + "\n".join(connection_summary[:20])
         )
+        time.sleep(COMMAND_DELAY)
         
         # Build final snapshot
         snapshot = {

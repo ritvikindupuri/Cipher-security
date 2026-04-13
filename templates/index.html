@@ -166,7 +166,7 @@
         .step.complete .step-status { color: var(--success); }
 
         /* Content */
-        .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
 
         .tabs {
             display: flex;
@@ -174,6 +174,7 @@
             padding: 16px 24px;
             background: var(--bg);
             border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
         }
 
         .tab {
@@ -191,7 +192,7 @@
         .tab.active { background: var(--text); color: white; }
 
         .panel { display: none; flex: 1; overflow: hidden; min-height: 0; }
-        .panel.active { display: flex; flex-direction: column; }
+        .panel.active { display: flex; flex-direction: column; overflow: hidden; }
 
         /* Command Log */
         .command-log {
@@ -703,11 +704,13 @@
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 16px;
-            padding: 20px;
+            padding: 16px;
             background: var(--bg-secondary);
             overflow-y: auto;
             flex: 1;
             min-height: 0;
+            height: 100%;
+            box-sizing: border-box;
         }
 
         .agent-output-card {
@@ -717,28 +720,30 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 0;
+            min-height: 200px;
+            height: 100%;
         }
 
         .agent-output-card.full {
             grid-column: span 2;
+            min-height: 150px;
         }
 
         .agent-output-header {
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             background: var(--bg);
             flex-shrink: 0;
         }
 
-        .agent-output-title { font-weight: 600; font-size: 14px; }
-        .agent-output-subtitle { font-size: 11px; color: var(--text-secondary); }
+        .agent-output-title { font-weight: 600; font-size: 13px; }
+        .agent-output-subtitle { font-size: 10px; color: var(--text-secondary); }
 
         .agent-output-content {
-            padding: 16px;
+            padding: 12px;
             overflow-y: auto;
             flex: 1;
             min-height: 0;
@@ -751,11 +756,12 @@
         .full-outputs-section {
             border-top: 1px solid var(--border);
             background: var(--bg);
-            padding: 20px;
+            padding: 16px;
             flex: 1;
-            min-height: 0;
+            min-height: 200px;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .full-outputs-tabs {
