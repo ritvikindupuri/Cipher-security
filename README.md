@@ -1,22 +1,32 @@
 # Scry
 
-**Reveal Hidden Threats** - A transparent AI-powered security analysis platform that combines live Windows telemetry with multi-agent DeepSeek AI analysis.
+**Reveal Hidden Threats** - An AI-powered security analysis platform that transforms raw Windows telemetry into actionable threat intelligence.
 
-Scry (skree) - from the old English word meaning "to look into the future, to discover hidden knowledge" - exactly what this app does by revealing unseen security threats in your system.
+Most security tools overwhelm you with data but leave the analysis to you. Scry does the opposite - it takes your system's real-time metrics and uses specialized AI agents to surface what actually matters. No alerts to ignore, no dashboards to interpret. Just clear, prioritized insights about your system's security posture.
+
+Scry (skree) - from the old English word meaning "to look into the future, to discover hidden knowledge" - because seeing threats before they become incidents is how you stop them.
 
 ---
 
 ## Key Features
 
-**100% Real Data** - Every metric comes directly from your Windows system via native APIs including CPU, memory, disk, network, and processes.
+**Real-Time System Telemetry**
+Scry continuously monitors your Windows machine, collecting CPU usage, memory allocation, disk utilization, network connections, and running processes. Every data point is traceable to its source system call, giving you confidence that what you see is what's actually happening.
 
-**Transparent AI** - Watch the AI think in real-time. See exact prompts, raw command outputs, and DeepSeek reasoning as it happens.
+**AI-Powered Threat Analysis**
+Three specialized agents work together to analyze your telemetry. The Observation Agent extracts factual findings from raw data. The Threat Agent maps these findings to potential attack vectors and vulnerabilities. The Scenario Agent synthesizes everything into actionable defensive strategies. Each agent builds on the previous one, creating a complete picture from raw numbers.
 
-**Multi-Agent Pipeline** - Three specialized DeepSeek agents: Observation Agent, Threat Agent, and Scenario Agent.
+**MITRE ATT&CK Framework Integration**
+Threats don't exist in a vacuum - Scry automatically maps detected patterns to the industry-standard MITRE ATT&CK framework. You see not just what might be wrong, but how it fits into known attack patterns, from initial access through data exfiltration.
 
-**MITRE ATT&CK Mapping** - Automatically maps detected patterns to industry-standard MITRE ATT&CK tactics and techniques.
+**Transparent Analysis Pipeline**
+Every AI decision is visible. Watch your telemetry flow through each agent, see the exact prompts sent to the AI, observe the reasoning as it happens. When Scry flags a concern, you can trace exactly why - back to the specific metric, the specific pattern, the specific technique that triggered it.
 
-**Live Dashboard** - Modern web interface with real-time command logging, AI output streaming, and PDF report generation.
+**Professional PDF Reports**
+Generate comprehensive security reports with one click. Include system snapshots, threat analysis, MITRE ATT&CK mappings, and recommended detection rules. Perfect for compliance documentation, incident response records, or sharing findings with your security team.
+
+**Live Streaming Dashboard**
+Watch analysis unfold in real-time. Telemetry collection appears command-by-command. AI agents share their thinking as they analyze. Visualizations update as patterns emerge. You don't wait for results - you watch them being created.
 
 ---
 
