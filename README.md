@@ -24,9 +24,9 @@ Cipher decrypts your system's security posture by collecting real-time metrics f
 
 <figure>
 <p align="center">
-  <img src="docs/architecture.png" alt="Cipher Architecture Diagram" width="900"/>
+  <img src="docs/architecture.png" alt="Cipher Architecture Diagram" width="850"/>
 </p>
-<figcaption align="center"><b>Figure 1:</b> Cipher System Architecture - Four-layer pipeline from data collection to report generation</figcaption>
+<figcaption align="center"><b>Figure 1:</b> System Architecture</figcaption>
 </figure>
 
 The system architecture consists of four interconnected layers that work together to collect, process, analyze, and visualize system telemetry.
