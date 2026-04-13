@@ -1,7 +1,5 @@
 """
-Cipher - Real Security Intelligence Dashboard
-Real-time security analysis with full transparency into AI thinking
-All outputs are 100% real - no simulation
+Sentinel - Real Security Intelligence Dashboard
 """
 
 from flask import Flask, render_template, Response, request, jsonify, send_file
@@ -269,7 +267,7 @@ def download_pdf():
     code_style = ParagraphStyle('Code', parent=styles['Code'], fontSize=8, leading=10,
                                 fontName='Courier', backColor=colors.HexColor('#1a1a2e'))
     
-    story.append(Paragraph("Cipher Security Analysis Report", title_style))
+    story.append(Paragraph("Sentinel Security Analysis Report", title_style))
     story.append(Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Model: {SESSION_DATA.get('model', 'N/A')}", subtitle_style))
     
     tel = SESSION_DATA.get("telemetry", {})
@@ -327,7 +325,7 @@ def download_pdf():
     doc.build(story)
     buffer.seek(0)
     
-    filename = f"Cipher_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    filename = f"Sentinel_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
     return send_file(buffer, mimetype='application/pdf', as_attachment=True, download_name=filename)
 
 

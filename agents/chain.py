@@ -77,9 +77,11 @@ def _call_streaming(
     system: str,
     user_text: str,
     max_tokens: int = 4096,
+    timeout: int = 120,
     out: TextIO | None = None,
     callback: Callable[[str], None] | None = None,
 ) -> str:
+    import httpx
     chunks: list[str] = []
     
     def _safe_write(text: str) -> None:
@@ -96,6 +98,7 @@ def _call_streaming(
             max_tokens=max_tokens,
             system=system,
             messages=[{"role": "user", "content": user_text}],
+            timeout=timeout,
         ) as stream:
             for text in stream.text_stream:
                 chunks.append(text)
@@ -103,22 +106,41 @@ def _call_streaming(
                 if callback:
                     callback(text)
     else:
-        stream = client.chat.completions.create(
-            model=model,
-            max_tokens=max_tokens,
-            stream=True,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_text},
-            ],
-        )
-        for chunk in stream:
-            if chunk.choices[0].delta.content:
-                text = chunk.choices[0].delta.content
-                chunks.append(text)
-                _safe_write(text)
-                if callback:
-                    callback(text)
+        with httpx.stream(
+            "POST",
+            f"{os.environ.get('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1')}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {os.environ.get('OPENROUTER_API_KEY')}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "max_tokens": max_tokens,
+                "stream": True,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user_text},
+                ],
+            },
+            timeout=timeout,
+        ) as response:
+            response.raise_for_status()
+            for line in response.iter_lines():
+                if line.startswith("data: "):
+                    data = line[6:]
+                    if data == "[DONE]":
+                        break
+                    try:
+                        import json as json_lib
+                        chunk_data = json_lib.loads(data)
+                        content = chunk_data.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                        if content:
+                            chunks.append(content)
+                            _safe_write(content)
+                            if callback:
+                                callback(content)
+                    except:
+                        pass
     return "".join(chunks).strip()
 
 
@@ -200,7 +222,8 @@ def run_claude_chain(
                     on_agent_chunk(agent_id, chunk)
             
             return _call_streaming(
-                client, provider, model=model, system=system, user_text=user_text, out=out, callback=callback
+                client, provider, model=model, system=system, user_text=user_text, 
+                out=out, callback=callback, timeout=120
             )
         text = _call_blocking(
             client, provider, model=model, system=system, user_text=user_text

@@ -1,0 +1,1874 @@
+{
+  "model": "deepseek/deepseek-chat-v3",
+  "agent1_facts": "## 1. HOST IDENTITY\n- **Hostname:** Ritvik-PC  \n> Source: snapshot.host.node\n- **OS:** Windows 11  \n> Source: snapshot.host.system and snapshot.host.release\n- **Build:** 10.0.26200  \n> Source: snapshot.host.version\n- **Architecture:** AMD64  \n> Source: snapshot.host.machine\n- **Boot Time:** 2026-04-09T16:36:02.175220+00:00  \n> Source: snapshot.boot_time_utc\n- **Uptime:** ~2 days (calculated from boot_time_utc and collected_at_utc)  \n\n---\n\n## 2. SYSTEM RESOURCES\n### CPU Usage:\n- **Current CPU Usage:** 79.1%  \n> Source: snapshot.cpu.usage_percent_interval_0_5s  \n**WARNING:** CPU usage is high (>80% threshold).  \n### Memory Usage:\n- **Total Memory:** 33767481344 bytes (~32 GB)  \n- **Used Memory:** 28587077632 bytes (~27 GB)  \n- **Memory Usage Percentage:** 84.7%  \n> Source: snapshot.memory.virtual.percent  \n**WARNING:** Memory usage is high (>90% threshold).  \n### Disk Usage:\n- **Device:** C:\\\\  \n- **Disk Usage:** 51.5%  \n> Source: snapshot.disks[0].percent_used  \n\n---\n\n## 3. NOTABLE PROCESSES  \nTop 10 processes by RSS memory usage (MB):  \n\n1. **chrome.exe** (PID: 30620) - **3134 MB**  \n   Parent: chrome.exe (PID: 9432)  \n   > Source: snapshot.processes[0]  \n2. **chrome.exe** (PID: 15164) - **2617 MB**  \n   Parent: chrome.exe (PID: 9432)  \n   > Source: snapshot.processes[1]  \n3. **chrome.exe** (PID: 24232) - **1816 MB**  \n   Parent: chrome.exe (PID: 9432)  \n   > Source: snapshot.processes[2]  \n4. **chrome.exe** (PID: 13212) - **1055 MB**  \n   Parent: chrome.exe (PID: 9432)  \n   > Source: snapshot.processes[3]  \n5. **chrome.exe** (PID: 33744) - **886 MB**  \n   Parent: chrome.exe (PID: 9432)  \n   > Source: snapshot.processes[4]  \n6. **MemCompression** (PID: 4380) - **716 MB**  \n   Parent: PID 4 (UNKNOWN)  \n   > Source: snapshot.processes[5]  \n7. **msedgewebview2.exe** (PID: 6316) - **704 MB**  \n   Parent: PID 36188 (UNKNOWN)  \n   > Source: snapshot.processes[6]  \n8. **chrome.exe** (PID: 9432) - **605 MB**  \n   Parent: explorer.exe (PID: 11964)  \n   > Source: snapshot.processes[7]  \n9. **chrome.exe** (PID: 19900) - **593 MB**  \n   Parent: chrome.exe (PID: 9432)  \n   > Source: snapshot.processes[8]  \n10. **chrome.exe** (PID: 508) - **535 MB**  \n   Parent: chrome.exe (PID: 9432)  \n   > Source: snapshot.processes[9]  \n\n---\n\n## 4. NETWORK LISTENERS  \nListening ports:  \n\n1. **Port:** 49672  \n   **Protocol:** TCP  \n   **Bind Address:** 0.0.0.0  \n   **Process:** PID 5652 (UNKNOWN)  \n   > Source: snapshot.network_connections[6]  \n2. **Port:** 49664  \n   **Protocol:** TCP  \n   **Bind Address:** 0.0.0.0  \n   **Process:** PID 1616 (UNKNOWN)  \n   > Source: snapshot.network_connections[16]  \n3. **Port:** 5353  \n   **Protocol:** UDP  \n   **Bind Address:** 0.0.0.0  \n   **Process:** PID 9432 (chrome.exe)  \n   > Source: snapshot.network_connections[60]  \n4. **Port:** 5040  \n   **Protocol:** TCP  \n   **Bind Address:** 0.0.0.0  \n   **Process:** PID 12616 (UNKNOWN)  \n   > Source: snapshot.network_connections[11]  \n\n---\n\n## 5. NETWORK CONNECTIONS  \nCloud providers detected:  \n- **Google:** 8.8.4.4, 8.8.8.8  \n- **Microsoft:** 13.107.137.11, 20.59.87.226  \n- **Amazon:** 52.96.164.178  \n\nConnection states:  \n- **ESTABLISHED:** 10.11.87.163:64137 → 150.171.27.11:443  \n> Source: snapshot.network_connections[8]  \n- **TIME_WAIT:** 10.11.87.163:55738 → 8.8.4.4:53  \n> Source: snapshot.network_connections[14]  \n\n---\n\n## 6. PROCESS -> NETWORK MAPPING  \nProcesses with network activity:  \n\n- **chrome.exe (PID 9432):** UDP traffic on port 5353  \n> Source: snapshot.network_connections[60]  \n- **MsMpEng.exe (PID 7144):** Established connection to 48.211.71.204:443  \n> Source: snapshot.network_connections[51]  \n\n---\n\n## 7. ANOMALIES (For Investigation - NOT Confirmed Threats)  \n**WARNING Anomaly #1: High CPU Usage**  \n- Observation: CPU usage is 79.1%.  \n- Source: snapshot.cpu.usage_percent_interval_0_5s  \n- Why it caught my attention: Sustained CPU usage above 80% can indicate performance bottlenecks.  \n- Recommended investigation: Identify processes consuming CPU using Task Manager or `Get-Process | Sort-Object CPU -Descending`.  \n\n**WARNING Anomaly #2: Multiple Chrome Processes**  \n- Observation: Multiple chrome.exe processes consuming significant memory.  \n- Source: snapshot.processes[]  \n- Why it caught my attention: Chrome processes collectively consume ~9.6 GB of memory.  \n- Recommended investigation: Verify active tabs/extensions using Chrome’s Task Manager (`Shift + Esc`).  \n\n---\n\n## 8. COMMAND EQUIVALENTS  \nCommands equivalent to this snapshot:  \n- **Host Identity:** `systeminfo`  \n- **Processes:** `Get-Process | Sort-Object WorkingSet -Descending | Select-Object -First 10`  \n- **Network Connections:** `netstat -ano`  \n- **Disk Usage:** `Get-WmiObject Win32_LogicalDisk | Select-Object DeviceID, FreeSpace, Size`  \n- **CPU/Memory:** `Get-Counter '\\Processor(_Total)\\% Processor Time', '\\Memory\\Available MBytes'`",
+  "agent2_mapping": "## LAYER A: OBSERVED (From Data)\n\n### Process Analysis:\n```\n**Process: chrome.exe (PID: 9432)**\n- Memory: 605 MB\n- Source: > snapshot.processes[7]\n- Security Relevance: Parent process of multiple chrome.exe instances, high memory consumption could indicate browser-based crypto mining or excessive tabs/extensions.\n\n**Process: MsMpEng.exe (PID: 7144)**\n- Memory: 236 MB\n- Source: > snapshot.processes[16]\n- Security Relevance: Windows Defender process communicating externally (48.211.71.204:443), could indicate cloud-based scanning or C2 communication if malicious.\n\n**Process: opencode-cli.exe (PID: 13932)**\n- Memory: 354 MB\n- Source: > snapshot.processes[13]\n- Security Relevance: Uncommon process (Local AppData) listening on port 52341, could be legitimate developer tool or backdoor.\n\n**Process: Kiro.exe (PID: 26816)**\n- Memory: 168 MB\n- Source: > snapshot.processes[21]\n- Security Relevance: Installed in user's AppData, could be legitimate software or potentially unwanted program (PUP).\n```\n\n### Network Analysis:\n```\n**TCP: 0.0.0.0:49672 -> LISTEN (PID 5652)**\n- Source: > snapshot.network_connections[6]\n- Security Relevance: Unknown process listening on all interfaces, could be RAT or backdoor.\n\n**TCP: 10.11.87.163:64137 → 150.171.27.11:443 (ESTABLISHED)**\n- Source: > snapshot.network_connections[8]\n- Security Relevance: Encrypted outbound traffic to unknown IP, could be exfiltration or legitimate cloud service.\n\n**UDP: 0.0.0.0:5353 (PID 9432)**\n- Source: > snapshot.network_connections[60]\n- Security Relevance: Chrome using mDNS (multicast DNS), could be abused for local network discovery.\n\n**TCP: 0.0.0.0:5040 -> LISTEN (PID 12616)**\n- Source: > snapshot.network_connections[11]\n- Security Relevance: Unknown process listening on non-standard port, could be vulnerable service.\n```\n\n## LAYER B: HYPOTHESIS (Plausible Attack Scenarios)\n\n```\n**Hypothesis #1: Browser-Based Cryptojacking**\n\nWhat I observed:\n- Multiple chrome.exe processes consuming ~9.6GB memory\n- High CPU usage (79.1%)\n- UDP 5353 traffic from Chrome\n\nHow an attacker could exploit this:\n1. Compromise browser via malicious ad/extension\n2. Execute JavaScript miner in background tabs\n3. Use mDNS to discover local network targets\n\nLikely motivation:\n- Financial gain through cryptocurrency mining\n\nPossible MITRE ATT&CK Mapping:\n- **Tactic:** TA0040 - Impact\n- **Technique:** T1496 - Resource Hijacking\n\nEvidence confidence: MEDIUM - Consistent with cryptojacking but could also be legitimate heavy browsing\n```\n\n```\n**Hypothesis #2: Suspicious Local Listener**\n\nWhat I observed:\n- Unknown process (PID 5652) listening on 0.0.0.0:49672\n- No process name in snapshot\n- High-numbered ephemeral port\n\nHow an attacker could exploit this:\n1. Install persistent backdoor\n2. Open listener on all interfaces\n3. Wait for incoming connections\n\nLikely motivation:\n- Remote access/command and control\n\nPossible MITRE ATT&CK Mapping:\n- **Tactic:** TA0011 - Command and Control\n- **Technique:** T1571 - Non-Standard Port\n\nEvidence confidence: HIGH - No legitimate reason for unknown process to listen on all interfaces\n```\n\n## LAYER C: BLIND SPOTS\n\n```\n**Persistence Mechanisms (NOT VISIBLE)**\n- No visibility into scheduled tasks or registry autoruns\n- Cannot verify if chrome.exe is set to run at startup\n- Unknown if listening services have persistence\n\n**Memory-Only Threats (NOT VISIBLE)**\n- No memory dump analysis for fileless malware\n- Can't detect PowerShell in-memory execution\n- No visibility into .NET assembly loading\n\n**Encrypted Traffic (LIMITED VISIBILITY)**\n- All HTTPS (443) connections could hide C2 traffic\n- Can't inspect TLS-encrypted payloads\n- DNS over HTTPS possible via Chrome\n\n**Process Relationships (PARTIAL)**\n- Limited parent-child process tracking\n- Can't see process creation timestamps\n- No command-line arguments captured\n```\n\n## EXPLOITABILITY ANALYSIS\n\n```\n**High CPU Usage**\n- Severity: MEDIUM\n- Exploitability: EASY\n- Data Source: snapshot.cpu.usage_percent_interval_0_5s\n\n**Unknown Listener (PID 5652)**\n- Severity: HIGH  \n- Exploitability: MODERATE\n- Data Source: snapshot.network_connections[6]\n\n**Chrome mDNS Traffic**\n- Severity: LOW\n- Exploitability: DIFFICULT  \n- Data Source: snapshot.network_connections[60]\n```\n\n## RECOMMENDED COMMANDS\n\n```powershell\n# Identify unknown listener:\nGet-Process -Id 5652 | Select-Object Name, Path, Company\n\n# Check Chrome extensions:\ndir \"$env:LOCALAPPDATA\\Google\\Chrome\\User Data\\Default\\Extensions\"\n\n# Investigate network listener:\nnetstat -ano | findstr 49672\nGet-NetTCPConnection -LocalPort 49672 | Select-Object OwningProcess, State\n\n# Check for persistence:\nschtasks /query /fo LIST /v\nreg query HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\n```\n\n## REASONING REQUIREMENT\n\n### Analyzing: Chrome Process Cluster\nI looked at: snapshot.processes[] (multiple chrome.exe instances)\nI found: 12 chrome.exe processes totaling ~9.6GB memory, all spawned from PID 9432\nI conclude: This could indicate either legitimate heavy browsing or browser-based abuse\nI recommend: Inspect Chrome task manager (Shift+Esc) for suspicious tabs/extensions\n\n### Analyzing: Unknown Listener\nI looked at: snapshot.network_connections[6] (PID 5652 listening on 49672)\nI found: Process with no name in snapshot listening on all interfaces\nI conclude: High probability of malicious listener given lack of process information\nI recommend: Immediate process inspection and memory dump if still running\n\n### Analyzing: Defender Network Activity  \nI looked at: snapshot.network_connections[51] (MsMpEng.exe to 48.211.71.204:443)\nI found: Windows Defender making outbound HTTPS connections\nI conclude: Likely cloud-delivered protection, but should verify destination reputation\nI recommend: Check Microsoft IP ranges to confirm legitimacy",
+  "agent3_scenario": "Here's the defensive security scenario based on the provided telemetry:\n\n### ## EXECUTIVE SUMMARY\n- **Scenario Name:** \"Chrome Cryptojacking with Hidden Listener\"\n- **Starting State:** High CPU/memory usage with multiple Chrome processes and an unknown listener on port 49672\n- **Threat Hypothesis:** Browser-based cryptojacking with a secondary backdoor listener\n- **Playbook Purpose:** Detection Gap Analysis\n\n---\n\n### ## STARTING CONDITIONS (OBSERVED)\n\n| Category | Observation | Data Source |\n|----------|-----------|-------------|\n| Host | Ritvik-PC, Windows 11 (10.0.26200), ~2 days uptime | > snapshot.host.node |\n| CPU | 79.1% utilization | > snapshot.cpu.usage_percent_interval_0_5s |\n| Memory | 84.7% used (27GB of 32GB) | > snapshot.memory.virtual |\n| Disk | 51.5% used | > snapshot.disks[0] |\n| Network | 10+ established connections | > snapshot.network_connections |\n| Notable Processes | 12 chrome.exe processes (9.6GB total), PID 5652 listening on 49672 | > snapshot.processes |\n\n---\n\n### ## HYPOTHETICAL ATTACK SCENARIO\n\n#### ### Phase 1: Initial Access (HYPOTHETICAL)\n**ATTACKER ACTION (HYPOTHETICAL):**\n1. User visits compromised site or installs malicious Chrome extension\n2. Extension loads cryptomining JavaScript payload\n\n**OBSERVED ARTIFACTS:**\n- Multiple chrome.exe processes with high memory usage\n- Chrome parent process (PID 9432) spawning child processes\n- **Source:** > snapshot.processes[0-12]\n\n**DEFENDER OPPORTUNITY:**\n- Monitor Chrome process trees for abnormal spawning\n- Baseline normal Chrome memory usage per tab\n\n#### ### Phase 2: Execution (HYPOTHETICAL)\n**ATTACKER ACTION (HYPOTHETICAL):**\n1. Miner executes in background tabs using WebAssembly\n2. Attacker drops secondary payload (opencode-cli.exe)\n\n**OBSERVED ARTIFACTS:**\n- Sustained high CPU usage (79.1%)\n- Uncommon process opencode-cli.exe in AppData\n- **Source:** > snapshot.cpu AND > snapshot.processes[13]\n\n**DEFENDER OPPORTUNITY:**\n- Detect WASM execution in Chrome\n- Alert on new executables in AppData/Local\n\n#### ### Phase 3: Persistence (HYPOTHETICAL)\n**ATTACKER ACTION (HYPOTHETICAL):**\n1. Attacker establishes listener via opencode-cli.exe\n2. Modifies Chrome startup flags for persistence\n\n**OBSERVED ARTIFACTS:**\n- Unknown process listening on 0.0.0.0:49672\n- Chrome maintaining connections after page closure\n- **Source:** > snapshot.network_connections[6]\n\n**DEFENDER OPPORTUNITY:**\n- Monitor Chrome command-line modifications\n- Detect listening sockets bound to all interfaces\n\n#### ### Phase 4: Defense Evasion (HYPOTHETICAL)\n**ATTACKER ACTION (HYPOTHETICAL):**\n1. Masquerades as Chrome traffic on port 5353 (mDNS)\n2. Uses PowerShell child process for cleanup\n\n**OBSERVED ARTIFACTS:**\n- Chrome UDP traffic on port 5353\n- PowerShell child of opencode-cli.exe\n- **Source:** > snapshot.network_connections[60] AND > snapshot.processes[53]\n\n**DEFENDER OPPORTUNITY:**\n- Detect PowerShell spawned by uncommon parents\n- Baseline normal mDNS traffic patterns\n\n#### ### Phase 5: C2/Exfiltration (HYPOTHETICAL)\n**ATTACKER ACTION (HYPOTHETICAL):**\n1. Uses Chrome's existing connections to blend in\n2. Exfiltrates via encrypted C2 channel (150.171.27.11:443)\n\n**OBSERVED ARTIFACTS:**\n- Established connection to unknown external IP\n- Chrome maintaining unusual TLS sessions\n- **Source:** > snapshot.network_connections[8]\n\n**DEFENDER OPPORTUNITY:**\n- Map Chrome connections to known-good domains\n- Detect long-lived TLS sessions\n\n---\n\n### ## ALTERNATIVE EXPLANATION (BENIGN)\n**Scenario:** Developer workstation with heavy browsing and local tools\n\n**Supporting Evidence:**\n- opencode-cli.exe could be legitimate developer tool\n- High Chrome usage from multiple work-related tabs\n- Port 49672 might be debug listener for local development\n\n**How to Verify:**\n- Check Chrome task manager (Shift+Esc) for tab titles\n- Validate opencode-cli.exe digital signature\n- Review process command lines via `wmic process get caption,commandline /value`\n\n---\n\n### ## DETECTION ENGINEERING\n\n#### ### Detection Rule Idea #1\n**Signal:** Chrome process tree depth > 5 levels\n**Threshold:** Any occurrence\n**Data Source:** Process parent/child relationships\n**Detection Logic:**\n```\nIF process.name == \"chrome.exe\" \nAND COUNT(process.children) > 15 \nTHEN alert(\"Excessive Chrome Process Tree\")\n```\n**Estimated Effectiveness:** MEDIUM\n\n#### ### Detection Rule Idea #2\n**Signal:** Listener on high port bound to 0.0.0.0\n**Threshold:** Non-system process\n**Data Source:** Network connections\n**Detection Logic:**\n```\nIF connection.status == \"LISTEN\" \nAND connection.local_ip == \"0.0.0.0\" \nAND connection.local_port > 49151 \nAND process.path NOT IN whitelist\nTHEN alert(\"Suspicious Listener\")\n```\n**Estimated Effectiveness:** HIGH\n\n---\n\n### ## TELEMETRY GAPS\n\n| Gap | Impact | Recommended Collection |\n|-----|--------|----------------------|\n| Chrome extension inventory | Can't verify malicious extensions | Collect `chrome://extensions` data |\n| Process command lines | Can't see execution context | Enable command-line auditing |\n| DNS queries | Can't map IPs to domains | Enable DNS logging |\n| WASM execution | Blind to browser mining | Chrome enterprise logging |\n\n---\n\n### ## RECOMMENDED NEXT STEPS\n1. Inspect Chrome extensions via `dir \"%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Extensions\"`\n2. Capture full process tree with `Get-WmiObject Win32_Process | Select Name,ProcessId,ParentProcessId,CommandLine`\n3. Validate 150.171.27.11 reputation via threat intelligence\n4. Check for Chrome persistence in registry: `reg query HKCU\\Software\\Google\\Chrome\\PreferenceMACs`\n\n---\n\n## REASONING\nThis scenario was built from:\n- Observed: Chrome process cluster, high CPU, unknown listener\n- Hypotheses: Cryptojacking (T1496) + backdoor (T1571)\n- Constraints: No added IOCs - all grounded in JSON data\n\nThe scenario maintains educational focus while showing how benign observations could indicate compromise.",
+  "telemetry": {
+    "schema": "groundtrace_windows_snapshot_v1",
+    "collected_at_utc": "2026-04-11T15:35:56.716271+00:00",
+    "host": {
+      "node": "Ritvik-PC",
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64",
+      "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "windows": {
+        "version": "11",
+        "build": "10.0.26200",
+        "csd": "SP0",
+        "edition": "Multiprocessor Free"
+      }
+    },
+    "boot_time_utc": "2026-04-09T16:36:02.175220+00:00",
+    "cpu": {
+      "logical_cpus": 14,
+      "physical_cpus": 12,
+      "usage_percent_interval_0_5s": 79.1
+    },
+    "memory": {
+      "virtual": {
+        "total": 33767481344,
+        "available": 5180403712,
+        "percent": 84.7,
+        "used": 28587077632,
+        "free": 5180403712
+      },
+      "swap": {
+        "total": 55834574848,
+        "used": 6073208832,
+        "free": 49761366016,
+        "percent": 10.9,
+        "sin": 0,
+        "sout": 0
+      }
+    },
+    "disks": [
+      {
+        "device": "C:\\",
+        "mountpoint": "C:\\",
+        "fstype": "NTFS",
+        "opts": "rw,fixed",
+        "total_bytes": 1022985498624,
+        "used_bytes": 526969794560,
+        "free_bytes": 496015704064,
+        "percent_used": 51.5
+      }
+    ],
+    "network_io": {
+      "bytes_sent": 106571009,
+      "bytes_recv": 331974973,
+      "packets_sent": 267444,
+      "packets_recv": 344577,
+      "errin": 0,
+      "errout": 0,
+      "dropin": 0,
+      "dropout": 0
+    },
+    "processes": [
+      {
+        "pid": 30620,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 3286519808,
+        "num_threads": 37,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 15164,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 2743476224,
+        "num_threads": 32,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 24232,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 1903824896,
+        "num_threads": 28,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 13212,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 1106567168,
+        "num_threads": 29,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 33744,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 928665600,
+        "num_threads": 35,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 4380,
+        "ppid": 4,
+        "name": "MemCompression",
+        "username": null,
+        "rss_bytes": 751108096,
+        "num_threads": 138,
+        "exe": "MemCompression"
+      },
+      {
+        "pid": 6316,
+        "ppid": 36188,
+        "name": "msedgewebview2.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 738168832,
+        "num_threads": 30,
+        "exe": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\146.0.3856.109\\msedgewebview2.exe"
+      },
+      {
+        "pid": 9432,
+        "ppid": 11964,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 634089472,
+        "num_threads": 52,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 19900,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 621432832,
+        "num_threads": 45,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 508,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 561184768,
+        "num_threads": 29,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 40812,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 509075456,
+        "num_threads": 29,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 32724,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 499675136,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 42688,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 424067072,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 13932,
+        "ppid": 10492,
+        "name": "opencode-cli.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 354308096,
+        "num_threads": 36,
+        "exe": "C:\\Users\\ritvi\\AppData\\Local\\OpenCode\\opencode-cli.exe"
+      },
+      {
+        "pid": 11964,
+        "ppid": 9680,
+        "name": "explorer.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 334045184,
+        "num_threads": 135,
+        "exe": "C:\\Windows\\explorer.exe"
+      },
+      {
+        "pid": 15080,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 295542784,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 7144,
+        "ppid": 1588,
+        "name": "MsMpEng.exe",
+        "username": null,
+        "rss_bytes": 236093440,
+        "num_threads": 64,
+        "exe": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.26020.6-0\\MsMpEng.exe"
+      },
+      {
+        "pid": 672,
+        "ppid": 1516,
+        "name": "dwm.exe",
+        "username": null,
+        "rss_bytes": 232103936,
+        "num_threads": 22,
+        "exe": "C:\\Windows\\System32\\dwm.exe"
+      },
+      {
+        "pid": 16940,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 210501632,
+        "num_threads": 30,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 43020,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 210251776,
+        "num_threads": 29,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 39612,
+        "ppid": 36188,
+        "name": "msedgewebview2.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 184590336,
+        "num_threads": 41,
+        "exe": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\146.0.3856.109\\msedgewebview2.exe"
+      },
+      {
+        "pid": 41456,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 178409472,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 26816,
+        "ppid": 29816,
+        "name": "Kiro.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 168521728,
+        "num_threads": 25,
+        "exe": "C:\\Users\\ritvi\\AppData\\Local\\Programs\\Kiro\\Kiro.exe"
+      },
+      {
+        "pid": 4880,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 150413312,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 41748,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 145752064,
+        "num_threads": 30,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 13708,
+        "ppid": 18344,
+        "name": "mscopilot.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 143048704,
+        "num_threads": 54,
+        "exe": "C:\\Program Files (x86)\\Microsoft\\Copilot\\Application\\mscopilot.exe"
+      },
+      {
+        "pid": 30548,
+        "ppid": 11964,
+        "name": "msedge.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 141168640,
+        "num_threads": 63,
+        "exe": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+      },
+      {
+        "pid": 3432,
+        "ppid": 27156,
+        "name": "Code.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 140423168,
+        "num_threads": 25,
+        "exe": "C:\\Users\\ritvi\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"
+      },
+      {
+        "pid": 30080,
+        "ppid": 1760,
+        "name": "WinStore.App.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 133951488,
+        "num_threads": 18,
+        "exe": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsStore_22602.1401.6.0_x64__8wekyb3d8bbwe\\WinStore.App.exe"
+      },
+      {
+        "pid": 36708,
+        "ppid": 41964,
+        "name": "OneDrive.Sync.Service.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 132444160,
+        "num_threads": 56,
+        "exe": "C:\\Users\\ritvi\\AppData\\Local\\Microsoft\\OneDrive\\26.051.0316.0004_1\\OneDrive.Sync.Service.exe"
+      },
+      {
+        "pid": 17780,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 132087808,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 13452,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 130076672,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 12232,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 112521216,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 212,
+        "ppid": 4,
+        "name": "",
+        "username": null,
+        "rss_bytes": 112476160,
+        "num_threads": 0,
+        "exe": ""
+      },
+      {
+        "pid": 16800,
+        "ppid": 41964,
+        "name": "OneDrive.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 110186496,
+        "num_threads": 42,
+        "exe": "C:\\Users\\ritvi\\AppData\\Local\\Microsoft\\OneDrive\\OneDrive.exe"
+      },
+      {
+        "pid": 4144,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 105037824,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 7156,
+        "ppid": 1588,
+        "name": "mc-fw-host.exe",
+        "username": null,
+        "rss_bytes": 102756352,
+        "num_threads": 177,
+        "exe": "C:\\Program Files\\McAfee\\WPS\\1.37.173.1\\mc-fw-host.exe"
+      },
+      {
+        "pid": 7624,
+        "ppid": 16228,
+        "name": "CiscoCollabHost.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 101183488,
+        "num_threads": 99,
+        "exe": "C:\\Users\\ritvi\\AppData\\Local\\CiscoSparkLauncher\\CiscoCollabHost.exe"
+      },
+      {
+        "pid": 38620,
+        "ppid": 29816,
+        "name": "Kiro.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 90619904,
+        "num_threads": 24,
+        "exe": "C:\\Users\\ritvi\\AppData\\Local\\Programs\\Kiro\\Kiro.exe"
+      },
+      {
+        "pid": 26412,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 87683072,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 24096,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 84713472,
+        "num_threads": 27,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 12632,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 81215488,
+        "num_threads": 29,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 23316,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 80146432,
+        "num_threads": 27,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 444,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 78761984,
+        "num_threads": 27,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 21832,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 78192640,
+        "num_threads": 29,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 39944,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 78004224,
+        "num_threads": 27,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 36252,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 76677120,
+        "num_threads": 26,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 46536,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 76595200,
+        "num_threads": 28,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 39160,
+        "ppid": 9432,
+        "name": "chrome.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 74850304,
+        "num_threads": 47,
+        "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      },
+      {
+        "pid": 1700,
+        "ppid": 13932,
+        "name": "powershell.exe",
+        "username": "RITVIK-PC\\ritvi",
+        "rss_bytes": 74244096,
+        "num_threads": 11,
+        "exe": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+      }
+    ],
+    "network_connections": [
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "10.11.87.163:137",
+        "remote": null,
+        "status": "NONE",
+        "pid": 4
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63364",
+        "remote": "23.33.22.141:443",
+        "status": "CLOSE_WAIT",
+        "pid": 20980
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": ":::5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 9432
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:55482",
+        "remote": null,
+        "status": "NONE",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63360",
+        "remote": "23.213.53.20:443",
+        "status": "CLOSE_WAIT",
+        "pid": 20980
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:62950",
+        "remote": "127.0.0.1:62951",
+        "status": "ESTABLISHED",
+        "pid": 6724
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "1",
+        "local": ":::49672",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 5652
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:52577",
+        "remote": "127.0.0.1:52576",
+        "status": "ESTABLISHED",
+        "pid": 7156
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:64137",
+        "remote": "150.171.27.11:443",
+        "status": "ESTABLISHED",
+        "pid": 27980
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:52341",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 13932
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:52065",
+        "remote": "3.226.99.92:443",
+        "status": "ESTABLISHED",
+        "pid": 27552
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:5040",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 12616
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63363",
+        "remote": "23.33.22.141:443",
+        "status": "CLOSE_WAIT",
+        "pid": 20980
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": "fe80::b7cf:1a1d:f128:ebc3:64172",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:55738",
+        "remote": "8.8.4.4:53",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:64425",
+        "remote": "52.96.164.178:443",
+        "status": "ESTABLISHED",
+        "pid": 30908
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:49664",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 1616
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:49681",
+        "remote": "127.0.0.1:49682",
+        "status": "ESTABLISHED",
+        "pid": 3624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:55742",
+        "remote": "13.107.137.11:443",
+        "status": "ESTABLISHED",
+        "pid": 16800
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "192.168.56.1:138",
+        "remote": null,
+        "status": "NONE",
+        "pid": 4
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "1",
+        "local": ":::49686",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 1588
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": ":::5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:55739",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:63218",
+        "remote": null,
+        "status": "NONE",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:58556",
+        "remote": "127.0.0.1:58557",
+        "status": "ESTABLISHED",
+        "pid": 3148
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "192.168.56.1:139",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 4
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:50060",
+        "remote": "8.8.4.4:53",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:49437",
+        "remote": "20.59.87.226:443",
+        "status": "ESTABLISHED",
+        "pid": 6940
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63852",
+        "remote": "170.114.52.83:443",
+        "status": "CLOSE_WAIT",
+        "pid": 8932
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:52341",
+        "remote": "127.0.0.1:50314",
+        "status": "ESTABLISHED",
+        "pid": 13932
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "192.168.56.1:2177",
+        "remote": null,
+        "status": "NONE",
+        "pid": 7268
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:50110",
+        "remote": "48.211.71.204:443",
+        "status": "ESTABLISHED",
+        "pid": 7144
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 30548
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:58557",
+        "remote": "127.0.0.1:58556",
+        "status": "ESTABLISHED",
+        "pid": 3148
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:52576",
+        "remote": "127.0.0.1:52577",
+        "status": "ESTABLISHED",
+        "pid": 7156
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:5355",
+        "remote": null,
+        "status": "NONE",
+        "pid": 2376
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 2376
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "127.0.0.1:1900",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:61445",
+        "remote": "172.217.214.188:5228",
+        "status": "ESTABLISHED",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:63313",
+        "remote": null,
+        "status": "NONE",
+        "pid": 27980
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63365",
+        "remote": "23.33.22.141:443",
+        "status": "CLOSE_WAIT",
+        "pid": 20980
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:49672",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 5652
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:54707",
+        "remote": null,
+        "status": "NONE",
+        "pid": 27552
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 9432
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:53814",
+        "remote": "172.64.148.235:443",
+        "status": "ESTABLISHED",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:57470",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:50111",
+        "remote": "48.211.71.204:443",
+        "status": "ESTABLISHED",
+        "pid": 7144
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:61114",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 40236
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:7680",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 20536
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:60526",
+        "remote": "44.38.13.30:9440",
+        "status": "SYN_SENT",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:50109",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "10.11.87.163:138",
+        "remote": null,
+        "status": "NONE",
+        "pid": 4
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53252",
+        "remote": "127.0.0.1:53253",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:65227",
+        "remote": "8.8.8.8:443",
+        "status": "ESTABLISHED",
+        "pid": 30908
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:64982",
+        "remote": "104.18.18.125:443",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:58559",
+        "remote": "127.0.0.1:58558",
+        "status": "ESTABLISHED",
+        "pid": 7740
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": "fe80::ede5:5400:92a8:2877:2177",
+        "remote": null,
+        "status": "NONE",
+        "pid": 7268
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:49666",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 2404
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": "fe80::b7cf:1a1d:f128:ebc3:2177",
+        "remote": null,
+        "status": "NONE",
+        "pid": 7268
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:65454",
+        "remote": null,
+        "status": "NONE",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:59465",
+        "remote": null,
+        "status": "NONE",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:59649",
+        "remote": null,
+        "status": "NONE",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:56134",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:58719",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:49320",
+        "remote": null,
+        "status": "NONE",
+        "pid": 2376
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63358",
+        "remote": "23.213.53.20:443",
+        "status": "CLOSE_WAIT",
+        "pid": 20980
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "1",
+        "local": ":::49664",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 1616
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:56978",
+        "remote": "8.8.8.8:53",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:61543",
+        "remote": "170.72.250.145:443",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:62089",
+        "remote": "20.59.87.226:443",
+        "status": "ESTABLISHED",
+        "pid": 16800
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": "fe80::ede5:5400:92a8:2877:64171",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "10.11.87.163:1900",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "1",
+        "local": ":::49665",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 1448
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53253",
+        "remote": "127.0.0.1:53252",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:56489",
+        "remote": "8.8.4.4:53",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:62763",
+        "remote": "52.168.117.175:443",
+        "status": "ESTABLISHED",
+        "pid": 16800
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:58718",
+        "remote": "8.8.4.4:53",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63361",
+        "remote": "23.213.53.20:443",
+        "status": "CLOSE_WAIT",
+        "pid": 20980
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "10.11.87.163:64175",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:64041",
+        "remote": "104.18.34.146:443",
+        "status": "ESTABLISHED",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "127.0.0.1:50413",
+        "remote": null,
+        "status": "NONE",
+        "pid": 6972
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63848",
+        "remote": "170.114.52.83:443",
+        "status": "CLOSE_WAIT",
+        "pid": 12548
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:58558",
+        "remote": "127.0.0.1:58559",
+        "status": "ESTABLISHED",
+        "pid": 7740
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53263",
+        "remote": "127.0.0.1:53262",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "1",
+        "local": ":::49666",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 2404
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:64139",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63359",
+        "remote": "23.213.53.20:443",
+        "status": "CLOSE_WAIT",
+        "pid": 20980
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53248",
+        "remote": "127.0.0.1:53249",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:56979",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "192.168.56.1:137",
+        "remote": null,
+        "status": "NONE",
+        "pid": 4
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53247",
+        "remote": "127.0.0.1:53246",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63362",
+        "remote": "23.200.156.207:443",
+        "status": "CLOSE_WAIT",
+        "pid": 20980
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:50314",
+        "remote": "127.0.0.1:52341",
+        "status": "ESTABLISHED",
+        "pid": 27980
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:49686",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 1588
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "192.168.56.1:1900",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:49667",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 4212
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:65304",
+        "remote": "52.96.79.50:443",
+        "status": "ESTABLISHED",
+        "pid": 30908
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": "fe80::ede5:5400:92a8:2877:1900",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": "::1:64173",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:445",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 4
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:61338",
+        "remote": null,
+        "status": "NONE",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53251",
+        "remote": "127.0.0.1:53250",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": "::1:1900",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": ":::5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 27552
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "127.0.0.1:64176",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:59282",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53250",
+        "remote": "127.0.0.1:53251",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:51469",
+        "remote": "172.64.148.235:443",
+        "status": "ESTABLISHED",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:64428",
+        "remote": "172.65.90.21:443",
+        "status": "ESTABLISHED",
+        "pid": 13932
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:62764",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:57468",
+        "remote": "170.72.239.25:443",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": ":::59215",
+        "remote": null,
+        "status": "NONE",
+        "pid": 2376
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "10.11.87.163:2177",
+        "remote": null,
+        "status": "NONE",
+        "pid": 7268
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:49682",
+        "remote": "127.0.0.1:49681",
+        "status": "ESTABLISHED",
+        "pid": 3624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:135",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 1924
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": ":::49320",
+        "remote": null,
+        "status": "NONE",
+        "pid": 2376
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:62951",
+        "remote": "127.0.0.1:62950",
+        "status": "ESTABLISHED",
+        "pid": 6724
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "192.168.56.1:64174",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:58020",
+        "remote": "135.234.174.40:443",
+        "status": "ESTABLISHED",
+        "pid": 27552
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": "fe80::b7cf:1a1d:f128:ebc3:1900",
+        "remote": null,
+        "status": "NONE",
+        "pid": 19248
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:60527",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": ":::5355",
+        "remote": null,
+        "status": "NONE",
+        "pid": 2376
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:61634",
+        "remote": "52.123.250.144:443",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:52341",
+        "remote": "127.0.0.1:53877",
+        "status": "ESTABLISHED",
+        "pid": 13932
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:59507",
+        "remote": "170.72.239.176:443",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:54097",
+        "remote": "52.0.249.123:443",
+        "status": "ESTABLISHED",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53262",
+        "remote": "127.0.0.1:53263",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:54629",
+        "remote": null,
+        "status": "NONE",
+        "pid": 21832
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:5050",
+        "remote": null,
+        "status": "NONE",
+        "pid": 12616
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:59221",
+        "remote": "8.8.8.8:443",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:50112",
+        "remote": "127.0.0.1:52341",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:64138",
+        "remote": "10.0.0.2:1515",
+        "status": "SYN_SENT",
+        "pid": 7496
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53877",
+        "remote": "127.0.0.1:52341",
+        "status": "ESTABLISHED",
+        "pid": 27980
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:59592",
+        "remote": "135.234.174.40:443",
+        "status": "ESTABLISHED",
+        "pid": 30908
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:59215",
+        "remote": null,
+        "status": "NONE",
+        "pid": 2376
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53249",
+        "remote": "127.0.0.1:53248",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": ":::5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 30548
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "1",
+        "local": ":::7680",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 20536
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "1",
+        "local": ":::49667",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 4212
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:53244",
+        "remote": "127.0.0.1:53245",
+        "status": "ESTABLISHED",
+        "pid": 7624
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:63366",
+        "remote": "23.33.22.141:443",
+        "status": "CLOSE_WAIT",
+        "pid": 20980
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "2",
+        "local": ":::5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 2376
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "127.0.0.1:19294",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 21060
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:139",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 4
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "10.11.87.163:61281",
+        "remote": "8.8.4.4:443",
+        "status": "TIME_WAIT",
+        "pid": 0
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "1",
+        "local": "0.0.0.0:49665",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 1448
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "1",
+        "local": ":::135",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 1924
+      },
+      {
+        "fd": -1,
+        "family": "23",
+        "type": "1",
+        "local": ":::445",
+        "remote": null,
+        "status": "LISTEN",
+        "pid": 4
+      },
+      {
+        "fd": -1,
+        "family": "2",
+        "type": "2",
+        "local": "0.0.0.0:5353",
+        "remote": null,
+        "status": "NONE",
+        "pid": 27552
+      }
+    ],
+    "perf_counters": null
+  }
+}

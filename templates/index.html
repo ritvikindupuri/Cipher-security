@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cipher - Security Analysis</title>
+    <title>Sentinel - Security Analysis</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -817,18 +817,20 @@
         <header class="header">
             <div class="logo">
                 <svg viewBox="0 0 32 32" fill="none">
-                    <!-- Lock body -->
-                    <rect x="6" y="14" width="20" height="14" rx="3" fill="#0071e3"/>
-                    <!-- Lock shackle -->
-                    <path d="M9 14V10C9 6.68629 11.6863 4 15 4H17C20.3137 4 23 6.68629 23 10V14" stroke="#0071e3" stroke-width="3" stroke-linecap="round" fill="none"/>
-                    <!-- Keyhole -->
-                    <circle cx="16" cy="20" r="2" fill="white"/>
-                    <rect x="14.5" y="20" width="3" height="5" rx="1" fill="white"/>
-                    <!-- Code lines suggesting analysis -->
-                    <line x1="10" y1="7" x2="14" y2="7" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"/>
-                    <line x1="10" y1="10" x2="12" y2="10" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"/>
+                    <!-- Shield outline -->
+                    <path d="M16 2L28 7V15C28 22 22 28 16 30C10 28 4 22 4 15V7L16 2Z" fill="#0071e3" stroke="#0071e3" stroke-width="1.5"/>
+                    <!-- Eye shape -->
+                    <ellipse cx="16" cy="15" rx="10" ry="6" fill="white" opacity="0.9"/>
+                    <ellipse cx="16" cy="15" rx="10" ry="6" stroke="#0071e3" stroke-width="1.5" fill="none"/>
+                    <!-- Pupil -->
+                    <circle cx="16" cy="15" r="3" fill="#0071e3"/>
+                    <!-- Eye highlight -->
+                    <circle cx="14" cy="13" r="1" fill="white"/>
+                    <!-- Scan lines on shield -->
+                    <line x1="6" y1="8" x2="10" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
+                    <line x1="26" y1="8" x2="22" y2="6" stroke="white" stroke-width="1" opacity="0.5"/>
                 </svg>
-                <span class="logo-name">Cipher</span>
+                <span class="logo-name">Sentinel</span>
             </div>
             <div class="header-actions">
                 <button id="downloadBtn" class="btn btn-secondary" disabled>Download Report</button>
