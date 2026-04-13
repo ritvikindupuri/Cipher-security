@@ -146,7 +146,7 @@ Cipher/
 |-- main.py                     CLI entry point (optional)
 |-- requirements.txt             Python dependencies
 |-- .env                        API keys (create from .env.example)
-|-- .env.example                Environment template
+|-- .env.example               Environment template
 |-- collectors/
 |   |-- __init__.py
 |   |-- windows_metrics.py      Original telemetry collector
