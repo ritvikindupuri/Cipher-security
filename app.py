@@ -92,7 +92,16 @@ def run_analysis():
         model = os.environ.get("OPENROUTER_MODEL", "deepseek/deepseek-chat-v3")
         SESSION_DATA["model"] = model
         
+        last_agent = "agent1"
+        
         def on_agent_chunk(agent_id: str, chunk: str):
+            nonlocal last_agent
+            if agent_id != last_agent:
+                last_agent = agent_id
+                if agent_id == "agent2":
+                    emit_event("phase", {"phase": "agent2", "status": "starting", "message": "Threats agent analyzing attack surface..."})
+                elif agent_id == "agent3":
+                    emit_event("phase", {"phase": "agent3", "status": "starting", "message": "Scenarios agent generating MITRE scenarios..."})
             SESSION_DATA["agent_outputs"][agent_id] += chunk
             emit_event("agent_chunk", {
                 "agent": agent_id,
@@ -112,17 +121,17 @@ def run_analysis():
         # Emit each prompt to the command log
         emit_event("prompt", {
             "agent": "agent1",
-            "name": "Agent 1: Telemetry Analyst",
+            "name": "Observations",
             "prompt": prompts["agent1"]
         })
         emit_event("prompt", {
             "agent": "agent2", 
-            "name": "Agent 2: Attack Surface Mapper",
+            "name": "Threats",
             "prompt": prompts["agent2"]
         })
         emit_event("prompt", {
             "agent": "agent3",
-            "name": "Agent 3: Tabletop Scenario Author",
+            "name": "Scenarios",
             "prompt": prompts["agent3"]
         })
         

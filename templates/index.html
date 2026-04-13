@@ -3,54 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cipher — Real Security Intelligence</title>
+    <title>Cipher - Security Analysis</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Apple Design System */
         :root {
-            --bg-primary: #000000;
-            --bg-secondary: #1d1d1f;
-            --bg-tertiary: #2d2d30;
-            --bg-card: #1c1c1e;
-            --bg-elevated: #2c2c2e;
-            --text-primary: #f5f5f7;
+            --bg: #ffffff;
+            --bg-secondary: #f5f5f7;
+            --bg-tertiary: #eaeaeb;
+            --text: #1d1d1f;
             --text-secondary: #86868b;
-            --text-tertiary: #6e6e73;
-            --accent-blue: #0a84ff;
-            --accent-green: #30d158;
-            --accent-orange: #ff9f0a;
-            --accent-red: #ff453a;
-            --accent-purple: #bf5af2;
-            --border-color: #38383a;
-            --separator: rgba(255, 255, 255, 0.06);
+            --accent: #0071e3;
+            --border: #d2d2d7;
+            --success: #34c759;
+            --warning: #ff9500;
+            --error: #ff3b30;
+            --purple: #5856d6;
+            --orange: #ff9500;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            background: var(--bg);
+            color: var(--text);
             font-size: 14px;
             line-height: 1.5;
-            color: var(--text-primary);
-            background: var(--bg-primary);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Layout */
-        .app {
-            display: flex;
-            flex-direction: column;
             height: 100vh;
             overflow: hidden;
         }
+
+        .app { display: flex; flex-direction: column; height: 100vh; }
 
         /* Header */
         .header {
@@ -58,619 +43,761 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 24px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid var(--separator);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo svg { width: 32px; height: 32px; }
+        .logo-name { font-size: 18px; font-weight: 600; color: var(--text); }
 
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-        }
+        .header-actions { display: flex; gap: 12px; }
 
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-        }
-
-        .logo-tagline {
-            font-size: 11px;
-            color: var(--text-tertiary);
-            letter-spacing: -0.01em;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        /* Apple Buttons */
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 20px;
-            border: none;
+            padding: 8px 16px;
             border-radius: 980px;
-            font-family: inherit;
+            border: none;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-            gap: 6px;
+            transition: all 0.2s;
         }
 
-        .btn-primary {
-            background: var(--accent-blue);
-            color: white;
-        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #0077ed; }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text); }
+        .btn-secondary:hover { background: #ddd; }
 
-        .btn-primary:hover:not(:disabled) {
-            background: #0077ed;
-            transform: scale(1.02);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            background: #3a3a3c;
-        }
-
-        .btn-secondary:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .btn-icon {
-            font-size: 14px;
-        }
-
-        /* Main Content */
-        .main {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
+        /* Main Layout */
+        .main { display: flex; flex: 1; overflow: hidden; }
 
         /* Sidebar */
         .sidebar {
-            width: 300px;
+            width: 240px;
             background: var(--bg-secondary);
-            border-right: 1px solid var(--separator);
+            border-right: 1px solid var(--border);
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            gap: 20px;
+            overflow-y: auto;
         }
 
-        .sidebar-section {
-            padding: 20px;
-            border-bottom: 1px solid var(--separator);
-        }
-
-        .sidebar-title {
-            font-size: 12px;
+        .section-title {
+            font-size: 11px;
             font-weight: 600;
-            color: var(--text-tertiary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
             margin-bottom: 12px;
-        }
-
-        /* Status Card */
-        .status-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 16px;
         }
 
         .status-indicator {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
+            gap: 8px;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
 
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--text-tertiary);
+            background: var(--text-secondary);
         }
 
-        .status-dot.ready { background: var(--accent-green); }
-        .status-dot.running { 
-            background: var(--accent-blue);
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        .status-dot.complete { background: var(--accent-green); }
-        .status-dot.error { background: var(--accent-red); }
+        .status-dot.ready { background: var(--success); }
+        .status-dot.running { background: var(--warning); animation: pulse 1.5s infinite; }
+        .status-dot.complete { background: var(--success); }
+        .status-dot.error { background: var(--error); }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .status-text { font-weight: 500; font-size: 13px; }
 
-        .status-text {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        .metric-card {
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
 
-        .status-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+        .metric-value { font-size: 20px; font-weight: 600; color: var(--text); }
+        .metric-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 
-        .metric {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .metric-label {
-            font-size: 11px;
-            color: var(--text-tertiary);
-        }
-
-        .metric-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* Progress Steps */
-        .progress-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .steps { display: flex; flex-direction: column; gap: 4px; }
 
         .step {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
+            gap: 10px;
+            padding: 10px;
             border-radius: 8px;
-            transition: background 0.2s;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            font-size: 13px;
         }
 
-        .step:hover {
-            background: var(--bg-card);
-        }
+        .step.active { border-color: var(--accent); background: rgba(0, 113, 227, 0.05); }
+        .step.complete { border-color: var(--success); }
 
         .step-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            background: var(--bg-elevated);
-            color: var(--text-tertiary);
         }
 
-        .step.active .step-icon {
-            background: var(--accent-blue);
-            color: white;
-        }
+        .step.active .step-icon { background: var(--accent); }
+        .step.complete .step-icon { background: var(--success); }
 
-        .step.complete .step-icon {
-            background: var(--accent-green);
-            color: white;
-        }
+        .step-info { flex: 1; }
+        .step-title { font-weight: 500; font-size: 13px; }
+        .step-status { font-size: 11px; color: var(--text-secondary); }
+        .step.active .step-status { color: var(--accent); }
+        .step.complete .step-status { color: var(--success); }
 
-        .step-content {
-            flex: 1;
-        }
+        /* Content */
+        .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-        .step-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .step-status {
-            font-size: 11px;
-            color: var(--text-tertiary);
-        }
-
-        .step.active .step-status {
-            color: var(--accent-blue);
-        }
-
-        .step.complete .step-status {
-            color: var(--accent-green);
-        }
-
-        /* Center Panel */
-        .center {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background: var(--bg-primary);
-        }
-
-        /* Tab Bar */
-        .tab-bar {
+        .tabs {
             display: flex;
             gap: 4px;
             padding: 16px 24px;
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--separator);
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
         }
 
         .tab {
             padding: 8px 16px;
             border-radius: 6px;
+            border: none;
+            background: transparent;
             font-size: 13px;
             font-weight: 500;
             color: var(--text-secondary);
-            background: transparent;
-            border: none;
             cursor: pointer;
-            transition: all 0.15s;
         }
 
-        .tab:hover {
-            color: var(--text-primary);
-            background: var(--bg-secondary);
-        }
+        .tab:hover { background: var(--bg-tertiary); color: var(--text); }
+        .tab.active { background: var(--text); color: white; }
 
-        .tab.active {
-            color: var(--text-primary);
-            background: var(--bg-secondary);
-        }
+        .panel { display: none; flex: 1; overflow: hidden; }
+        .panel.active { display: flex; flex-direction: column; }
 
-        /* Content Area */
-        .content-area {
-            flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .panel.active {
-            display: flex;
-        }
-
-        .panel-header {
-            padding: 16px 24px;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--separator);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .panel-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .panel-body {
+        /* Command Log */
+        .command-log {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
-        }
-
-        /* Terminal */
-        .terminal {
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .terminal-bar {
-            background: var(--bg-tertiary);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .terminal-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .terminal-dot.red { background: #ff5f57; }
-        .terminal-dot.yellow { background: #febc2e; }
-        .terminal-dot.green { background: #28c840; }
-
-        .terminal-title {
-            flex: 1;
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-tertiary);
-        }
-
-        .terminal-content {
-            flex: 1;
-            padding: 16px;
-            font-family: "SF Mono", "Menlo", "Monaco", monospace;
+            padding: 20px;
+            background: #0d0d0f;
+            font-family: "SF Mono", "Menlo", "Consolas", monospace;
             font-size: 12px;
-            line-height: 1.6;
-            overflow-y: auto;
         }
 
-        .terminal-line {
+        .log-header-block {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0 16px 0;
+            padding: 0;
+        }
+
+        .log-header-block .header-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #333 50%, transparent);
+        }
+
+        .log-header-block .header-text {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
+            white-space: nowrap;
+        }
+
+        .log-header-block.system .header-text { color: #10b981; }
+        .log-header-block.observations .header-text { color: var(--accent); }
+        .log-header-block.threats .header-text { color: var(--purple); }
+        .log-header-block.scenarios .header-text { color: var(--orange); }
+        .log-header-block.success .header-text { color: var(--success); }
+        .log-header-block.error .header-text { color: var(--error); }
+
+        .log-entry {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
             margin-bottom: 4px;
+            background: rgba(255,255,255,0.02);
+            border-left: 3px solid transparent;
+        }
+
+        .log-entry:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .log-entry.info { border-left-color: var(--accent); }
+        .log-entry.success { border-left-color: var(--success); }
+        .log-entry.command { border-left-color: #f59e0b; }
+        .log-entry.exec { border-left-color: #10b981; background: rgba(16, 185, 129, 0.05); }
+        .log-entry.output { border-left-color: #6b7280; }
+        .log-entry.error { border-left-color: var(--error); background: rgba(239, 68, 68, 0.1); }
+
+        .log-timestamp {
+            color: #555;
+            font-size: 10px;
+            min-width: 65px;
+            font-family: "SF Mono", monospace;
+        }
+
+        .log-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .log-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .log-message {
+            color: #ccc;
+            flex: 1;
+            line-height: 1.5;
             word-break: break-word;
         }
 
-        .terminal-line.system { color: var(--text-tertiary); }
-        .terminal-line.info { color: var(--accent-blue); }
-        .terminal-line.success { color: var(--accent-green); }
-        .terminal-line.warning { color: var(--accent-orange); }
-        .terminal-line.error { color: var(--accent-red); }
-        .terminal-line.command { color: #fff; }
-        .terminal-line.output { color: #888; padding-left: 20px; }
-
-        /* Agent Output */
-        .agent-panel {
-            background: var(--bg-card);
-            border-radius: 12px;
-            overflow: hidden;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .agent-header {
-            padding: 14px 16px;
-            background: var(--bg-elevated);
-            border-bottom: 1px solid var(--separator);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .agent-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            background: var(--accent-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-
-        .agent-info h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .agent-info p {
-            font-size: 11px;
-            color: var(--text-tertiary);
-        }
-
-        .agent-content {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            font-size: 13px;
-            line-height: 1.7;
-            color: var(--text-primary);
-        }
-
-        .agent-content h1 { font-size: 20px; margin: 16px 0 12px; color: var(--text-primary); }
-        .agent-content h2 { font-size: 17px; margin: 14px 0 10px; color: var(--text-primary); }
-        .agent-content h3 { font-size: 15px; margin: 12px 0 8px; color: var(--text-secondary); }
-        .agent-content strong { color: var(--accent-orange); }
-        .agent-content code { 
-            background: var(--bg-tertiary); 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            font-family: "SF Mono", monospace;
-            font-size: 12px;
-            color: var(--accent-purple);
-        }
-        .agent-content pre { 
-            background: var(--bg-tertiary); 
-            padding: 12px; 
-            border-radius: 8px; 
-            overflow-x: auto;
-            margin: 12px 0;
-        }
-        .agent-content pre code {
-            background: none;
-            padding: 0;
-        }
-        .agent-content ul, .agent-content ol {
-            margin: 12px 0;
-            padding-left: 24px;
-        }
-        .agent-content li { margin: 6px 0; }
-        .agent-content blockquote {
-            border-left: 3px solid var(--accent-blue);
-            padding-left: 12px;
-            margin: 12px 0;
-            color: var(--text-secondary);
-        }
-
-        .placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-tertiary);
-            text-align: center;
-        }
-
-        .placeholder-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        .placeholder p {
-            font-size: 14px;
-        }
-
-        /* Toast */
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 1000;
-        }
-
-        .toast {
-            padding: 14px 20px;
-            background: var(--bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--separator);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .toast-message {
-            font-size: 13px;
-            color: var(--text-primary);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-tertiary);
-        }
-
-        /* Right Sidebar */
-        .right-sidebar {
-            width: 280px;
-            background: var(--bg-secondary);
-            border-left: 1px solid var(--separator);
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .stat-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: var(--text-tertiary);
-            margin-top: 2px;
-        }
-
-        .process-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .process-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            background: var(--bg-card);
-            border-radius: 8px;
-        }
-
-        .process-name {
-            font-size: 13px;
-            color: var(--text-primary);
+        .log-entry.exec .log-message {
+            color: #10b981;
             font-weight: 500;
         }
 
-        .process-rss {
+        .log-entry.error .log-message {
+            color: #f87171;
+        }
+
+        .log-block {
+            margin: 12px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #222;
+        }
+
+        .log-block.observations { border-color: rgba(0, 113, 227, 0.3); }
+        .log-block.threats { border-color: rgba(88, 86, 214, 0.3); }
+        .log-block.scenarios { border-color: rgba(255, 149, 0, 0.3); }
+
+        .log-block .log-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid #222;
+        }
+
+        .log-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #666;
+            margin-left: auto;
+        }
+
+        .thinking-indicator {
+            font-size: 10px;
+            color: var(--accent);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .log-content {
+            padding: 14px;
+        }
+
+        .prompt-content {
+            background: #1a1a2e;
+        }
+
+        .prompt-description {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .prompt-text {
+            color: #888;
+            font-size: 11px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #0f0f1a;
+            padding: 12px;
+            border-radius: 4px;
+        }
+
+        .ai-response {
+            background: #0a1a14;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .response-text {
+            color: #10b981;
             font-size: 12px;
-            color: var(--text-tertiary);
-            font-variant-numeric: tabular-nums;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .command-block {
+            margin-bottom: 24px;
+            border-left: 3px solid var(--border);
+            padding-left: 16px;
+        }
+
+        .command-block.system { border-color: var(--text-secondary); }
+        .command-block.observations { border-color: var(--accent); }
+        .command-block.threats { border-color: var(--purple); }
+        .command-block.scenarios { border-color: var(--orange); }
+
+        .agent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .agent-badge.system { background: #333; color: #fff; }
+        .agent-badge.observations { background: var(--accent); color: #fff; }
+        .agent-badge.threats { background: var(--purple); color: #fff; }
+        .agent-badge.scenarios { background: var(--orange); color: #fff; }
+
+        .agent-badge svg { width: 14px; height: 14px; }
+
+        .command-text { color: #fff; margin: 4px 0; }
+        .command-text.exec { color: #10b981; }
+
+        .thinking {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+
+        .thinking-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        .thinking-text { color: #ccc; line-height: 1.6; }
+
+        .command-output {
+            color: #10b981;
+            background: #0a1a14;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .command-error { color: var(--error); margin: 8px 0; }
+
+        .prompt-box {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+
+        .prompt-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .prompt-content {
+            color: #888;
+            font-size: 11px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: "SF Mono", "Menlo", monospace;
+        }
+
+        .agent-output {
+            background: #0a1a14;
+            border: 1px solid #1a3a2a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 8px 0;
+            color: #10b981;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: "SF Mono", "Menlo", monospace;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Agent Panels */
+        .agent-panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            overflow-y: auto;
+        }
+
+        .agent-card {
+            background: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .agent-card.full { grid-column: span 2; }
+
+        .agent-card-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .agent-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .agent-avatar svg { width: 20px; height: 20px; }
+        .agent-avatar.observations { background: rgba(0, 113, 227, 0.1); }
+        .agent-avatar.threats { background: rgba(88, 86, 214, 0.1); }
+        .agent-avatar.scenarios { background: rgba(255, 149, 0, 0.1); }
+
+        .agent-name { font-weight: 600; font-size: 14px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); }
+
+        .agent-card-content { padding: 16px; overflow-y: auto; flex: 1; }
+
+        /* Visualizations */
+        .viz-container {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .viz-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Bar Chart */
+        .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+
+        .bar-item { display: flex; align-items: center; gap: 10px; }
+
+        .bar-label { width: 80px; font-size: 11px; font-weight: 500; }
+
+        .bar-track { flex: 1; height: 24px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            transition: width 0.5s ease;
+        }
+
+        .bar-fill.cpu { background: var(--accent); }
+        .bar-fill.memory { background: var(--purple); }
+        .bar-fill.disk { background: var(--success); }
+        .bar-fill.network { background: var(--orange); }
+
+        .bar-value { width: 45px; font-size: 11px; font-weight: 600; text-align: right; }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-secondary); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+        .legend-dot.cpu { background: var(--accent); }
+        .legend-dot.memory { background: var(--purple); }
+        .legend-dot.disk { background: var(--success); }
+        .legend-dot.network { background: var(--orange); }
+
+        /* Process Table */
+        .process-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+
+        .process-table th {
+            text-align: left;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 9px;
+            letter-spacing: 0.5px;
+        }
+
+        .process-table td { padding: 8px; border-bottom: 1px solid var(--border); }
+        .process-table tr:hover { background: var(--bg-secondary); }
+        .process-name { font-weight: 500; }
+        .process-pid { font-family: monospace; color: var(--text-secondary); }
+        .process-memory { font-weight: 600; color: var(--accent); }
+
+        /* Attack List */
+        .attack-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .attack-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .attack-severity { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+        .attack-severity.high { background: var(--error); }
+        .attack-severity.medium { background: var(--warning); }
+        .attack-severity.low { background: var(--success); }
+
+        .attack-content { flex: 1; }
+        .attack-title { font-weight: 600; font-size: 12px; }
+        .attack-desc { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+        .attack-mitre { 
+            display: inline-block;
+            margin-top: 6px;
+            padding: 2px 6px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+            font-family: monospace;
+            color: var(--text-secondary);
+        }
+
+        /* Scenario Table */
+        .scenario-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+
+        .scenario-table th {
+            text-align: left;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 9px;
+            letter-spacing: 0.5px;
+        }
+
+        .scenario-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            background: var(--orange);
+            color: white;
+            white-space: nowrap;
+        }
+
+        .mitre-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            font-family: monospace;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; }
+
+        .toast {
+            padding: 14px 20px;
+            background: var(--text);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .agent-outputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            max-height: 40vh;
+        }
+
+        .agent-output-card {
+            background: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .agent-output-card.full {
+            grid-column: span 2;
+        }
+
+        .agent-output-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg);
+        }
+
+        .agent-output-title { font-weight: 600; font-size: 14px; }
+        .agent-output-subtitle { font-size: 11px; color: var(--text-secondary); }
+
+        .agent-output-content {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .scenario-table-container {
+            overflow-x: auto;
+        }
+
+        .full-outputs-section {
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+            padding: 20px;
+            max-height: 55vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-outputs-tabs {
+            display: flex;
+            gap: 4px;
+            margin: 12px 0;
+        }
+
+        .full-output-tab {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .full-output-tab:hover { background: var(--bg-tertiary); color: var(--text); }
+        .full-output-tab.active { background: var(--text); color: white; }
+
+        .full-output-content {
+            flex: 1;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #1a1a1a;
+        }
+
+        .full-output-text {
+            color: #e0e0e0;
+            font-size: 12px;
+            line-height: 1.7;
+            padding: 16px;
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: "SF Mono", "Menlo", "Consolas", monospace;
+            overflow-y: auto;
+            height: 100%;
+            max-height: 45vh;
+        }
+
+        .full-output-text.loading {
+            color: var(--text-secondary);
+            font-style: italic;
         }
     </style>
 </head>
@@ -678,103 +805,107 @@
     <div class="app">
         <header class="header">
             <div class="logo">
-                <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
-                    <defs>
-                        <linearGradient id="cipherGrad" x1="0" y1="0" x2="32" y2="32">
-                            <stop offset="0%" stop-color="#00d4ff"/>
-                            <stop offset="100%" stop-color="#0a84ff"/>
-                        </linearGradient>
-                    </defs>
-                    <!-- Outer hexagon -->
-                    <path d="M16 2L28 9V23L16 30L4 23V9L16 2Z" stroke="url(#cipherGrad)" stroke-width="2" fill="none"/>
-                    <!-- Inner lock body -->
-                    <rect x="10" y="14" width="12" height="10" rx="2" fill="url(#cipherGrad)"/>
-                    <!-- Lock shackle -->
-                    <path d="M12 14V11C12 9 13.5 7 16 7C18.5 7 20 9 20 11V14" stroke="url(#cipherGrad)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                    <!-- Keyhole -->
-                    <circle cx="16" cy="18" r="2" fill="#000"/>
-                    <rect x="15" y="18" width="2" height="4" fill="#000"/>
-                    <!-- Neural dots -->
-                    <circle cx="8" cy="8" r="1.5" fill="#00d4ff" opacity="0.8"/>
-                    <circle cx="24" cy="8" r="1.5" fill="#0a84ff" opacity="0.8"/>
-                    <circle cx="8" cy="24" r="1.5" fill="#0a84ff" opacity="0.8"/>
-                    <circle cx="24" cy="24" r="1.5" fill="#00d4ff" opacity="0.8"/>
+                <svg viewBox="0 0 32 32" fill="none">
+                    <!-- Shield with brain pattern -->
+                    <path d="M16 2L28 8V16C28 22 22 28 16 30C10 28 4 22 4 16V8L16 2Z" fill="#0071e3" stroke="#0071e3" stroke-width="2"/>
+                    <!-- Brain neural pattern inside -->
+                    <circle cx="11" cy="12" r="2" fill="white"/>
+                    <circle cx="16" cy="10" r="2" fill="white"/>
+                    <circle cx="21" cy="12" r="2" fill="white"/>
+                    <circle cx="13" cy="17" r="2" fill="white"/>
+                    <circle cx="19" cy="17" r="2" fill="white"/>
+                    <line x1="11" y1="12" x2="16" y2="10" stroke="white" stroke-width="1.5"/>
+                    <line x1="16" y1="10" x2="21" y2="12" stroke="white" stroke-width="1.5"/>
+                    <line x1="11" y1="12" x2="13" y2="17" stroke="white" stroke-width="1.5"/>
+                    <line x1="21" y1="12" x2="19" y2="17" stroke="white" stroke-width="1.5"/>
+                    <line x1="13" y1="17" x2="19" y2="17" stroke="white" stroke-width="1.5"/>
                 </svg>
-                <div class="logo-text">
-                    <span class="logo-name">Cipher</span>
-                    <span class="logo-tagline">Real Security Intelligence</span>
-                </div>
+                <span class="logo-name">Cipher</span>
             </div>
             <div class="header-actions">
-                <button id="downloadBtn" class="btn btn-secondary" disabled>
-                    <span class="btn-icon">↓</span>
-                    Download Report
-                </button>
-                <button id="executeBtn" class="btn btn-primary">
-                    <span class="btn-icon">▶</span>
-                    Execute Analysis
-                </button>
+                <button id="downloadBtn" class="btn btn-secondary" disabled>Download Report</button>
+                <button id="executeBtn" class="btn btn-primary">Execute Analysis</button>
             </div>
         </header>
 
         <main class="main">
             <aside class="sidebar">
-                <div class="sidebar-section">
-                    <div class="sidebar-title">Status</div>
-                    <div class="status-card">
-                        <div class="status-indicator">
-                            <div class="status-dot" id="statusDot"></div>
-                            <span class="status-text" id="statusText">Ready</span>
+                <div>
+                    <div class="section-title">Status</div>
+                    <div class="status-indicator">
+                        <div class="status-dot" id="statusDot"></div>
+                        <span class="status-text" id="statusText">Ready</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">System Metrics</div>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-value" id="metricCPU">-</div>
+                            <div class="metric-label">CPU</div>
                         </div>
-                        <div class="status-metrics">
-                            <div class="metric">
-                                <span class="metric-label">Phase</span>
-                                <span class="metric-value" id="metricPhase">—</span>
-                            </div>
-                            <div class="metric">
-                                <span class="metric-label">Commands</span>
-                                <span class="metric-value" id="metricCommands">0</span>
-                            </div>
-                            <div class="metric">
-                                <span class="metric-label">Model</span>
-                                <span class="metric-value" id="metricModel">—</span>
-                            </div>
-                            <div class="metric">
-                                <span class="metric-label">Host</span>
-                                <span class="metric-value" id="metricHost">—</span>
-                            </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="metricMemory">-</div>
+                            <div class="metric-label">Memory</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="metricDisk">-</div>
+                            <div class="metric-label">Disk</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="metricNet">-</div>
+                            <div class="metric-label">Network</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="sidebar-section" style="flex: 1;">
-                    <div class="sidebar-title">Progress</div>
-                    <div class="progress-steps">
-                        <div class="step" id="step-telemetry">
-                            <div class="step-icon">📊</div>
-                            <div class="step-content">
-                                <div class="step-title">Telemetry Collection</div>
+                <div>
+                    <div class="section-title">Progress</div>
+                    <div class="steps">
+                        <div class="step" id="step-1">
+                            <div class="step-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v6l4 2"/>
+                                </svg>
+                            </div>
+                            <div class="step-info">
+                                <div class="step-title">Collection</div>
                                 <div class="step-status">Pending</div>
                             </div>
                         </div>
-                        <div class="step" id="step-agent1">
-                            <div class="step-icon">🔍</div>
-                            <div class="step-content">
-                                <div class="step-title">Agent 1: Analysis</div>
+                        <div class="step" id="step-2">
+                            <div class="step-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 20V10M18 20V4M6 20v-4"/>
+                                </svg>
+                            </div>
+                            <div class="step-info">
+                                <div class="step-title">Observations</div>
                                 <div class="step-status">Pending</div>
                             </div>
                         </div>
-                        <div class="step" id="step-agent2">
-                            <div class="step-icon">🎯</div>
-                            <div class="step-content">
-                                <div class="step-title">Agent 2: Attack Mapping</div>
+                        <div class="step" id="step-3">
+                            <div class="step-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                            </div>
+                            <div class="step-info">
+                                <div class="step-title">Threats</div>
                                 <div class="step-status">Pending</div>
                             </div>
                         </div>
-                        <div class="step" id="step-agent3">
-                            <div class="step-icon">📋</div>
-                            <div class="step-content">
-                                <div class="step-title">Agent 3: Scenario</div>
+                        <div class="step" id="step-4">
+                            <div class="step-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                                </svg>
+                            </div>
+                            <div class="step-info">
+                                <div class="step-title">Scenarios</div>
                                 <div class="step-status">Pending</div>
                             </div>
                         </div>
@@ -782,118 +913,147 @@
                 </div>
             </aside>
 
-            <section class="center">
-                <nav class="tab-bar">
-                    <button class="tab active" data-tab="commands">Command Log</button>
+            <section class="content">
+                <nav class="tabs">
+                    <button class="tab active" data-tab="log">Command Log</button>
                     <button class="tab" data-tab="agents">Agent Outputs</button>
                 </nav>
 
-                <div class="content-area">
-                    <div class="panel active" id="panel-commands">
-                        <div class="panel-body" style="padding: 0;">
-                            <div class="terminal">
-                                <div class="terminal-bar">
-                                    <div class="terminal-dot red"></div>
-                                    <div class="terminal-dot yellow"></div>
-                                    <div class="terminal-dot green"></div>
-                                    <span class="terminal-title">veritas — command execution log</span>
+                <div class="panel active" id="panel-log">
+                    <div class="command-log" id="commandLog">
+                        <div class="command-block system">
+                            <div class="agent-badge system">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                                    <path d="M9 9h6M9 13h6M9 17h4"/>
+                                </svg>
+                                System
+                            </div>
+                            <div class="command-text">Ready to analyze. Click "Execute Analysis" to begin.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" id="panel-agents">
+                    <div class="agent-outputs-grid">
+                        <!-- Observations -->
+                        <div class="agent-output-card" id="card-observations">
+                            <div class="agent-output-header">
+                                <div class="agent-avatar observations">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2">
+                                        <path d="M12 20V10M18 20V4M6 20v-4"/>
+                                    </svg>
                                 </div>
-                                <div class="terminal-content" id="terminalOutput">
-                                    <div class="terminal-line system">Veritas Security Analysis System</div>
-                                    <div class="terminal-line system">All data is collected in real-time from your system.</div>
-                                    <div class="terminal-line info">Click "Execute Analysis" to begin the security scan.</div>
+                                <div>
+                                    <div class="agent-output-title">Observations</div>
+                                    <div class="agent-output-subtitle">System Telemetry Analysis</div>
+                                </div>
+                            </div>
+                            <div class="agent-output-content" id="output-observations">
+                                <div class="viz-container">
+                                    <div class="viz-title">Resource Usage</div>
+                                    <div class="bar-chart" id="resourceChart">
+                                        <div class="bar-item">
+                                            <span class="bar-label">CPU</span>
+                                            <div class="bar-track"><div class="bar-fill cpu" id="chartCPU" style="width: 0%"></div></div>
+                                            <span class="bar-value" id="chartCPUVal">0%</span>
+                                        </div>
+                                        <div class="bar-item">
+                                            <span class="bar-label">Memory</span>
+                                            <div class="bar-track"><div class="bar-fill memory" id="chartMemory" style="width: 0%"></div></div>
+                                            <span class="bar-value" id="chartMemoryVal">0%</span>
+                                        </div>
+                                        <div class="bar-item">
+                                            <span class="bar-label">Disk</span>
+                                            <div class="bar-track"><div class="bar-fill disk" id="chartDisk" style="width: 0%"></div></div>
+                                            <span class="bar-value" id="chartDiskVal">0%</span>
+                                        </div>
+                                        <div class="bar-item">
+                                            <span class="bar-label">Network</span>
+                                            <div class="bar-track"><div class="bar-fill network" id="chartNet" style="width: 0%"></div></div>
+                                            <span class="bar-value" id="chartNetVal">0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="viz-container">
+                                    <div class="viz-title">Top Processes</div>
+                                    <table class="process-table">
+                                        <thead>
+                                            <tr><th>Process</th><th>PID</th><th>Memory</th></tr>
+                                        </thead>
+                                        <tbody id="processTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Threats -->
+                        <div class="agent-output-card" id="card-threats">
+                            <div class="agent-output-header">
+                                <div class="agent-avatar threats">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#5856d6" stroke-width="2">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                        <path d="M12 8v4M12 16h.01"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="agent-output-title">Threats</div>
+                                    <div class="agent-output-subtitle">Attack Surface Mapping</div>
+                                </div>
+                            </div>
+                            <div class="agent-output-content" id="output-threats">
+                                <div class="attack-list" id="threatList">
+                                    <div style="color: var(--text-secondary); font-size: 12px;">Awaiting threat analysis...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scenarios -->
+                        <div class="agent-output-card full" id="card-scenarios">
+                            <div class="agent-output-header">
+                                <div class="agent-avatar scenarios">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#ff9500" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="agent-output-title">Scenarios</div>
+                                    <div class="agent-output-subtitle">MITRE ATT&CK Defensive Scenarios</div>
+                                </div>
+                            </div>
+                            <div class="agent-output-content" id="output-scenarios">
+                                <div class="scenario-table-container">
+                                    <table class="scenario-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Phase</th>
+                                                <th>MITRE Tactic</th>
+                                                <th>Evidence</th>
+                                                <th>Detection Signal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="scenarioTable"></tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="panel" id="panel-agents">
-                        <div class="panel-body">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; height: 100%;">
-                                <div class="agent-panel">
-                                    <div class="agent-header">
-                                        <div class="agent-avatar">🔍</div>
-                                        <div class="agent-info">
-                                            <h3>Agent 1: Telemetry Analyst</h3>
-                                            <p>Real-time analysis of system metrics</p>
-                                        </div>
-                                    </div>
-                                    <div class="agent-content" id="agent1Content">
-                                        <div class="placeholder">
-                                            <div class="placeholder-icon">📊</div>
-                                            <p>Agent output will appear here in real-time</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="agent-panel">
-                                    <div class="agent-header">
-                                        <div class="agent-avatar">🎯</div>
-                                        <div class="agent-info">
-                                            <h3>Agent 2: Attack Surface</h3>
-                                            <p>Mapping potential vulnerabilities</p>
-                                        </div>
-                                    </div>
-                                    <div class="agent-content" id="agent2Content">
-                                        <div class="placeholder">
-                                            <div class="placeholder-icon">🎯</div>
-                                            <p>Agent output will appear here in real-time</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="agent-panel" style="grid-column: span 2;">
-                                    <div class="agent-header">
-                                        <div class="agent-avatar">📋</div>
-                                        <div class="agent-info">
-                                            <h3>Agent 3: Tabletop Scenario</h3>
-                                            <p>Defensive security training scenarios</p>
-                                        </div>
-                                    </div>
-                                    <div class="agent-content" id="agent3Content">
-                                        <div class="placeholder">
-                                            <div class="placeholder-icon">📋</div>
-                                            <p>Agent output will appear here in real-time</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    
+                    <!-- Full Agent Outputs Section -->
+                    <div class="full-outputs-section">
+                        <div class="section-title">Full Agent Outputs</div>
+                        <div class="full-outputs-tabs">
+                            <button class="full-output-tab active" data-output="observations">Observations</button>
+                            <button class="full-output-tab" data-output="threats">Threats</button>
+                            <button class="full-output-tab" data-output="scenarios">Scenarios</button>
+                        </div>
+                        <div class="full-output-content" id="fullOutputContent">
+                            <pre class="full-output-text" id="fullOutputText">Select an agent to view its complete output...</pre>
                         </div>
                     </div>
                 </div>
             </section>
-
-            <aside class="right-sidebar">
-                <div class="sidebar-title">System Metrics</div>
-                <div class="stat-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">⚡</div>
-                        <div class="stat-value" id="statCPU">—</div>
-                        <div class="stat-label">CPU Usage</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🧠</div>
-                        <div class="stat-value" id="statMemory">—</div>
-                        <div class="stat-label">Memory</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">💾</div>
-                        <div class="stat-value" id="statDisk">—</div>
-                        <div class="stat-label">Disk</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🌐</div>
-                        <div class="stat-value" id="statNet">—</div>
-                        <div class="stat-label">Network</div>
-                    </div>
-                </div>
-
-                <div class="sidebar-title">Top Processes</div>
-                <div class="process-list" id="processList">
-                    <div class="process-item">
-                        <span class="process-name">—</span>
-                        <span class="process-rss">—</span>
-                    </div>
-                </div>
-            </aside>
         </main>
     </div>
 
