@@ -1,6 +1,6 @@
 # Cipher
 
-**Real Security Intelligence** - A transparent AI-powered security analysis platform that combines live Windows telemetry with multi-agent AI analysis.
+**Real Security Intelligence** - A transparent AI-powered security analysis platform that combines live Windows telemetry with multi-agent DeepSeek AI analysis.
 
 Cipher decrypts your system's security posture by collecting real-time metrics from your Windows machine and processing them through specialized AI agents. Every insight is traceable to source data, every AI decision is explainable, and every command execution is visible. This is not a simulated demo - it is a working security analysis tool built for transparency.
 
@@ -20,35 +20,32 @@ Cipher decrypts your system's security posture by collecting real-time metrics f
 
 ## System Architecture
 
-The system consists of four main layers that work together to collect, process, and analyze system telemetry.
+**Figure 1: Cipher System Architecture**
 
-**Layer 1: Data Collection**
+<figure>
+<p align="center">
+  <img src="docs/architecture.png" alt="Cipher Architecture Diagram" width="900"/>
+</p>
+<figcaption align="center"><b>Figure 1:</b> Cipher System Architecture - Four-layer pipeline from data collection to report generation</figcaption>
+</figure>
 
-- The LoggingCollector module uses psutil to make direct system calls
-- Commands executed include psutil.cpu_percent(), psutil.process_iter(), psutil.net_connections(), psutil.disk_usage(), and psutil.virtual_memory()
-- Every command is logged with timestamp, output, duration, and status
-- Events are emitted via Server-Sent Events to the dashboard
+The system architecture consists of four interconnected layers that work together to collect, process, analyze, and visualize system telemetry.
 
-**Layer 2: AI Processing**
+**Layer 1: Data Collection (Collectors)**
 
-- Telemetry JSON is combined with system prompts and sent to DeepSeek LLM via OpenRouter API
-- Agent 1 receives the raw telemetry and extracts factual observations
-- Agent 2 receives Agent 1 output plus original telemetry and maps attack surface
-- Agent 3 receives Agent 1 and Agent 2 output and generates defensive scenarios
-- All responses stream token-by-token back to the dashboard
+The LoggingCollector module serves as the foundation of the system. It uses psutil to make direct system calls including psutil.cpu_percent() for processor utilization, psutil.process_iter() for active process enumeration, psutil.net_connections() for network socket inspection, psutil.disk_usage() for storage analysis, and psutil.virtual_memory() for memory pressure assessment. Every command executed by the collector is logged with timestamp, raw output, execution duration, and success status. Events are emitted via Server-Sent Events to the dashboard in real-time.
 
-**Layer 3: Dashboard Display**
+**Layer 2: AI Processing (Agents)**
 
-- Flask server hosts the web interface and handles API requests
-- Command Log tab shows system commands with timestamps and raw outputs
-- Agent Outputs tab shows real-time AI reasoning
-- Progress indicators track execution through each phase
+The Agent Chain orchestrates three specialized DeepSeek LLM instances through OpenRouter. Agent 1 receives the raw telemetry JSON and extracts factual observations without inference. Agent 2 receives Agent 1 output combined with original telemetry and performs attack surface mapping. Agent 3 receives both prior agent outputs and generates defensive tabletop scenarios. All responses stream token-by-token back to the dashboard for real-time visibility into the AI reasoning process.
 
-**Layer 4: Report Generation**
+**Layer 3: Dashboard Display (Frontend)**
 
-- ReportLab generates professional PDF reports
-- Reports include system overview, telemetry summary, and all agent outputs
-- Reports are downloadable after analysis completion
+The Flask server hosts the web interface and manages API requests. The Command Log tab displays system commands with timestamps and raw outputs in a terminal-style format. The Agent Outputs tab provides real-time streaming of AI reasoning as each agent generates its analysis. Progress indicators throughout the interface track execution status through each phase of the analysis pipeline.
+
+**Layer 4: Report Generation (Output)**
+
+ReportLab generates professional PDF reports containing the system overview, telemetry summary, and all agent outputs. Reports are downloadable after analysis completion and serve as artifacts for documentation and further review.
 
 ---
 
@@ -135,75 +132,6 @@ Navigate to http://127.0.0.1:5000 in your web browser.
 - Monitor the Command Log tab for real-time system data collection
 - Switch to the Agent Outputs tab to see AI analysis as it happens
 - Download the PDF report when analysis completes
-
----
-
-## Project Structure
-
-```
-Cipher/
-|-- app.py                      Flask web server and API endpoints
-|-- main.py                     CLI entry point (optional)
-|-- requirements.txt             Python dependencies
-|-- .env                        API keys (create from .env.example)
-|-- .env.example               Environment template
-|-- collectors/
-|   |-- __init__.py
-|   |-- windows_metrics.py      Original telemetry collector
-|   |-- enhanced_metrics.py     Logging telemetry collector
-|-- agents/
-|   |-- chain.py                Multi-agent orchestration with DeepSeek
-|   |-- prompts/
-|       |-- agent1_facts.txt   Telemetry Analyst prompt
-|       |-- agent2_attack_surface.txt  Attack Mapper prompt
-|       |-- agent3_scenario.txt        Scenario Author prompt
-|-- templates/
-|   |-- index.html              Dashboard HTML
-|-- static/
-|   |-- css/
-|   |   |-- cybersecurity.css   Apple-style UI
-|   |-- js/
-|       |-- cipher.js          Dashboard logic
-|-- README.md                   This file
-```
-
----
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| / | GET | Dashboard web interface |
-| /api/status | GET | Current analysis status |
-| /api/execute | POST | Start new analysis |
-| /api/stream | GET | SSE stream of events |
-| /api/telemetry | GET | Raw telemetry JSON |
-| /api/commands | GET | Command execution log |
-| /api/prompts | GET | System prompts used |
-| /api/agents | GET | Agent outputs |
-| /api/report | GET | Full analysis report |
-| /api/download/pdf | GET | Download PDF report |
-
----
-
-## Security Notes
-
-- No Exploits: Cipher only reads system data, never executes attacks
-- Privacy: Telemetry stays local; only prompts sent to DeepSeek via OpenRouter
-- Transparency: Every AI decision can be traced to source data
-- Audit Trail: All commands and outputs are logged
-
----
-
-## For AI Security Engineers
-
-This project demonstrates key competencies for AI security engineering roles:
-
-- Prompt Engineering: Multi-agent orchestration with safety constraints and grounded outputs
-- AI Safety: DeepSeek outputs are constrained to observed data, preventing hallucination
-- Threat Modeling: MITRE ATT&CK aligned analysis through specialized agents
-- Detection Engineering: Defensive scenario generation for security training
-- Real-time Systems: Live streaming dashboards using Server-Sent Events
 
 ---
 
