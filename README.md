@@ -1,10 +1,12 @@
 # Scry
 
-**Reveal Hidden Threats** - An AI-powered security analysis platform that transforms raw Windows telemetry into actionable threat intelligence.
+An AI-powered security analysis platform that transforms raw Windows telemetry into actionable threat intelligence.
 
-Most security tools overwhelm you with data but leave the analysis to you. Scry does the opposite - it takes your system's real-time metrics and uses specialized AI agents to surface what actually matters. No alerts to ignore, no dashboards to interpret. Just clear, prioritized insights about your system's security posture.
+Most security tools overwhelm you with raw data and leave the analysis to you. This platform takes a different approach - it collects your system's real-time metrics and uses specialized AI agents to surface what actually matters. CPU spikes, unusual network connections, suspicious processes - the platform analyzes all of it and tells you what's worth your attention.
 
-Scry (skree) - from the old English word meaning "to look into the future, to discover hidden knowledge" - because seeing threats before they become incidents is how you stop them.
+The platform uses three AI agents that work together: one extracts meaningful observations from raw telemetry, another maps those observations to potential threats, and a third generates defensive scenarios based on real findings. Each agent builds on the last, creating a complete picture from scattered metrics.
+
+Threats are automatically mapped to the MITRE ATT&CK framework, so you see not just what's abnormal, but how it fits into known attack patterns. Reports export to PDF for documentation or sharing. The entire analysis pipeline is visible - you see every command run, every AI decision made, every finding surfaced.
 
 ---
 
