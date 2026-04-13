@@ -543,6 +543,7 @@
             border-radius: 8px;
             padding: 14px;
             margin-bottom: 12px;
+            overflow: visible;
         }
 
         .viz-title {
@@ -715,8 +716,7 @@
             padding: 12px;
             background: var(--bg-secondary);
             flex: 1;
-            min-height: 0;
-            overflow: hidden;
+            overflow: auto;
         }
 
         .agent-output-card {
@@ -725,7 +725,6 @@
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         .agent-output-card.full {
@@ -747,8 +746,8 @@
 
         .agent-output-content {
             padding: 12px;
-            overflow-y: auto;
             flex: 1;
+            overflow: visible;
         }
 
         .scenario-table-container {
