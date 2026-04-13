@@ -756,9 +756,8 @@
         }
 
         .full-outputs-section {
-            border-top: 1px solid var(--border);
-            background: var(--bg);
-            padding: 12px;
+            background: var(--bg-secondary);
+            padding: 16px;
             flex: 1;
             min-height: 0;
             display: flex;
@@ -926,6 +925,7 @@
             <section class="content">
                 <nav class="tabs">
                     <button class="tab active" data-tab="log">Command Log</button>
+                    <button class="tab" data-tab="viz">Visualizations</button>
                     <button class="tab" data-tab="agents">Agent Outputs</button>
                 </nav>
 
@@ -944,7 +944,7 @@
                     </div>
                 </div>
 
-                <div class="panel" id="panel-agents">
+                <div class="panel" id="panel-viz">
                     <div class="agent-outputs-grid">
                         <!-- Observations -->
                         <div class="agent-output-card" id="card-observations">
@@ -1049,10 +1049,11 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Full Agent Outputs Section -->
+                </div>
+
+                <!-- Agent Outputs Panel -->
+                <div class="panel" id="panel-agents">
                     <div class="full-outputs-section">
-                        <div class="section-title">Full Agent Outputs</div>
                         <div class="full-outputs-tabs">
                             <button class="full-output-tab active" data-output="observations">Observations</button>
                             <button class="full-output-tab" data-output="threats">Threats</button>
