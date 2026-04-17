@@ -323,7 +323,7 @@ def download_pdf():
     story.append(Paragraph(SESSION_DATA["agent_outputs"].get("agent2", "No output"), body_style))
     story.append(PageBreak())
     
-    story.append(Paragraph("Agent 3: Tabletop Scenario", heading_style))
+    story.append(Paragraph("Agent 3: Detection Engineering", heading_style))
     story.append(Paragraph(SESSION_DATA["agent_outputs"].get("agent3", "No output"), body_style))
     
     doc.build(story)

@@ -125,7 +125,9 @@ class CipherDashboard {
         html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
         html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
         
-        html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+        html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+            return `<pre><code>${code}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>`;
+        });
         html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
         
         html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -790,4 +792,15 @@ class CipherDashboard {
 
 document.addEventListener('DOMContentLoaded', () => {
     window.cipher = new CipherDashboard();
+    window.copyCode = function(btn) {
+        const code = btn.previousElementSibling.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    };
 });
