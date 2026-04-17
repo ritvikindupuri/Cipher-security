@@ -133,17 +133,41 @@ class CipherDashboard {
         
         html = html.replace(/^\> (.+)$/gm, '<blockquote>$1</blockquote>');
         
-        html = html.replace(/^\| (.+) \|$/gm, (match) => {
-            const cells = match.slice(1, -1).split('|').map(c => c.trim());
-            if (cells.some(c => /^-+$/.test(c))) return '';
-            return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
-        });
+        const tableRows = [];
+        const separatorIndices = [];
+        const lines = html.split('\n');
         
-        const tableMatch = html.match(/(<tr>.*<\/tr>\s*)+/g);
-        if (tableMatch) {
-            tableMatch.forEach(table => {
-                html = html.replace(table, `<table>${table}</table>`);
-            });
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const rowMatch = line.match(/^\s*\|(.+)\|\s*$/);
+            if (rowMatch) {
+                const cells = rowMatch[1].split('|').map(c => c.trim());
+                if (cells.every(c => /^-+$/.test(c))) {
+                    separatorIndices.push(tableRows.length);
+                } else {
+                    tableRows.push(cells);
+                }
+            }
+        }
+        
+        if (tableRows.length > 0) {
+            let tableHtml = '<table><thead>';
+            if (separatorIndices.length > 0) {
+                tableHtml += '<tr>' + tableRows[0].map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+                for (let i = separatorIndices[0] + 1; i < tableRows.length; i++) {
+                    tableHtml += '<tr>' + tableRows[i].map(c => `<td>${c}</td>`).join('') + '</tr>';
+                }
+            } else {
+                tableHtml += '<tr>' + tableRows[0].map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+                for (let i = 1; i < tableRows.length; i++) {
+                    tableHtml += '<tr>' + tableRows[i].map(c => `<td>${c}</td>`).join('') + '</tr>';
+                }
+            }
+            tableHtml += '</tbody></table>';
+            
+            html = html.replace(/^\s*\|.+\|\s*$/gm, '').replace(/^\s*\|[-:\s|]+\|\s*$/gm, '');
+            html = html.replace(/<\/table>\s*<table>/g, '');
+            html += '\n' + tableHtml;
         }
         
         html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
@@ -474,7 +498,7 @@ class CipherDashboard {
                 
                 if (name.length > 2) {
                     processRows.push(`<tr>
-                        <td class="process-name">${this.escapeHtml(name.substring(0, 25))}</td>
+                        <td class="process-name" style="word-break: break-all; max-width: 150px;">${this.escapeHtml(name)}</td>
                         <td class="process-pid">${this.escapeHtml(pid)}</td>
                         <td class="process-memory">${this.escapeHtml(mem)}</td>
                     </tr>`);
@@ -510,7 +534,7 @@ class CipherDashboard {
                     
                     if (text.length > 5) {
                         threats.push({
-                            title: text.substring(0, 80),
+                            title: text,
                             severity: severity,
                             mitre: mitres.slice(0, 3)
                         });
@@ -527,7 +551,7 @@ class CipherDashboard {
                 const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
                 if (cleanLine.length > 15) {
                     threats.push({
-                        title: cleanLine.substring(0, 80),
+                        title: cleanLine,
                         severity: 'medium',
                         mitre: line.match(/T\d{4}[\.\d]*/g) || []
                     });
@@ -576,15 +600,15 @@ class CipherDashboard {
             }
             
             if (cleanLine.match(/severity.*high/i)) {
-                foundThreats.push({ severity: 'HIGH', text: cleanLine.substring(0, 60) });
+                foundThreats.push({ severity: 'HIGH', text: cleanLine });
             } else if (cleanLine.match(/severity.*medium/i)) {
-                foundThreats.push({ severity: 'MEDIUM', text: cleanLine.substring(0, 60) });
+                foundThreats.push({ severity: 'MEDIUM', text: cleanLine });
             }
             
             if (cleanLine.match(/condition|threshold|monitor|detect|alert/i) && cleanLine.includes(':')) {
                 const parts = cleanLine.split(':');
                 if (parts.length > 1) {
-                    foundConditions.push(parts[1].trim().substring(0, 80));
+                    foundConditions.push(parts[1].trim());
                 }
             }
         }
