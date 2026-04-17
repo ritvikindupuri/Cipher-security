@@ -68,7 +68,7 @@ ReportLab generates professional PDF reports containing system overview, telemet
 | Backend | Python 3.10+ | Core logic and processing |
 | Web Server | Flask | HTTP API and SSE streaming |
 | Telemetry | psutil | System metrics collection |
-| AI Provider | OpenRouter + DeepSeek | Language model analysis |
+| AI Provider | DeepSeek API | Language model analysis |
 | Frontend | Vanilla JS | Dashboard interface |
 | Styling | CSS (Apple Design) | Modern UI |
 | PDF | ReportLab | Report generation |
@@ -99,70 +99,79 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### Step 4: Get Your OpenRouter API Key
+### Step 4: Get Your DeepSeek API Key
 
-OpenRouter provides access to DeepSeek and other AI models through a unified API. Here's how to get started:
+Scry uses DeepSeek's official API for AI analysis. Here's how to get your API key:
 
-**4.1 Create an OpenRouter Account**
-1. Go to https://openrouter.ai
-2. Click "Sign Up" and create an account (you can use Google, GitHub, or email)
-3. Verify your email if required
+**4.1 Create a DeepSeek Account**
+1. Go to https://platform.deepseek.com
+2. Click "Sign Up" in the top-right corner
+3. You can sign up with Google, GitHub, or email/password
+4. Verify your email if required
 
-**4.2 Get Your API Key**
-1. After logging in, click on your profile icon in the top-right corner
-2. Select "Keys" from the dropdown menu
-3. Click "Create Key"
-4. Give it a name (e.g., "Scry App")
-5. Copy the generated API key - it starts with `sk-or-v1-`
+**4.2 Access the API Keys Section**
+1. After logging in, go to https://platform.deepseek.com/api_keys
+2. Or click on your profile icon and select "API Keys"
 
-**4.3 Add Credits (Required for API Usage)**
-1. Click on your profile and select "Credits"
-2. Click "Add credits" 
-3. Add funds (DeepSeek is one of the cheapest models - $0.50-$1.00 typically covers hundreds of analyses)
-4. DeepSeek DeepSeek Chat v3 costs approximately $0.001 per 1K tokens - very affordable!
+**4.3 Create Your API Key**
+1. Click the "Create API Key" button
+2. Enter a name for your key (e.g., "Scry Security Analysis")
+3. Click "Create"
+4. **Important:** Copy the API key immediately - it will only be shown once
+5. The key starts with `sk-` (e.g., `sk-58c247c59f8c43c49c92ec00b8e852ea`)
 
-**4.4 Choose Your Model**
+**4.4 Add Credits to Your Account**
+1. Go to https://platform.deepseek.com/credits
+2. Click "Add credits"
+3. Choose an amount - DeepSeek is very affordable:
+   - DeepSeek Chat (deepseek-chat): ~$0.001 per 1K tokens
+   - DeepSeek Reasoner (deepseek-reasoner): ~$0.001 per 1K tokens
+   - **$1-2 credits typically covers hundreds of analyses**
+4. Complete the payment
 
-The `.env` file comes pre-configured with `deepseek/deepseek-chat-v3`, which is:
-- Fast response times
-- Excellent for analysis tasks
-- Very cost-effective
-- Available on OpenRouter's free tier for new users
+**4.5 Understand the Model Options**
 
-Other recommended models on OpenRouter:
-| Model | Cost | Best For |
-|-------|------|----------|
-| `deepseek/deepseek-chat-v3` | ~$0.50/1M tokens | **Recommended** - Balanced speed/quality |
-| `deepseek/deepseek-r1` | ~$0.50/1M tokens | Better reasoning, slower |
-| `anthropic/claude-3.5-haiku` | ~$0.80/1M tokens | Fast, good quality |
-| `google/gemini-2.0-flash-exp` | Free | No cost, good quality |
+The app uses DeepSeek's chat model. Available models:
+
+| Model | Model ID | Cost | Best For |
+|-------|----------|------|----------|
+| DeepSeek Chat | `deepseek-chat` | ~$0.50/1M tokens | **Recommended** - Fast, balanced |
+| DeepSeek Reasoner | `deepseek-reasoner` | ~$0.50/1M tokens | Better reasoning, slower |
 
 ### Step 5: Configure Environment
 
-Create a `.env` file in the project root with your OpenRouter configuration:
+Create a `.env` file in the project root with your DeepSeek configuration:
 
 ```bash
-# Enable OpenRouter (required)
-USE_OPENROUTER=1
+# Enable DeepSeek API (required)
+USE_DEEPSEEK=1
 
-# Your OpenRouter API key (paste your key here)
-OPENROUTER_API_KEY=sk-or-v1-your-key-here
+# Your DeepSeek API key (paste your key here)
+DEEPSEEK_API_KEY=sk-your-key-here
 
-# Model selection (deepseek/deepseek-chat-v3 is recommended)
-OPENROUTER_MODEL=deepseek/deepseek-chat-v3
+# Model selection (deepseek-chat is recommended)
+DEEPSEEK_MODEL=deepseek-chat
 ```
 
 Example with a real key:
 ```bash
-USE_OPENROUTER=1
-OPENROUTER_API_KEY=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
-OPENROUTER_MODEL=deepseek/deepseek-chat-v3
+USE_DEEPSEEK=1
+DEEPSEEK_API_KEY=sk-58c247c59f8c43c49c92ec00b8e852ea
+DEEPSEEK_MODEL=deepseek-chat
 ```
 
 **How the App Uses These Variables:**
-- `USE_OPENROUTER=1` tells the app to use OpenRouter instead of Anthropic directly
-- `OPENROUTER_API_KEY` authenticates your requests to OpenRouter's API
-- `OPENROUTER_MODEL` specifies which AI model to use for all three agents
+- `USE_DEEPSEEK=1` tells the app to use DeepSeek's API
+- `DEEPSEEK_API_KEY` authenticates your requests to DeepSeek's servers
+- `DEEPSEEK_MODEL` specifies which DeepSeek model to use for all three agents
+
+**Alternative: Using OpenRouter**
+If you prefer OpenRouter instead, you can use:
+```bash
+USE_OPENROUTER=1
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+OPENROUTER_MODEL=deepseek/deepseek-chat-v3
+```
 
 ### Step 6: Run the Dashboard
 ```bash
@@ -221,18 +230,18 @@ The app maps security observations to MITRE ATT&CK tactics:
 ## Troubleshooting
 
 **Agent gets stuck on "Running..."**
-- Check your OpenRouter API key is valid
-- Ensure you have credits in OpenRouter
-- DeepSeek models may be rate-limited during high traffic
+- Check your DeepSeek API key is valid
+- Ensure you have credits in your DeepSeek account at platform.deepseek.com/credits
+- DeepSeek API may be rate-limited during high traffic
 
 **No data in visualizations**
 - Make sure you're running on Windows
 - Check telemetry collection completed successfully in Command Log
 
 **API Errors**
-- Verify your `OPENROUTER_API_KEY` is correct
-- Check you have sufficient credits at openrouter.ai/credits
-- Try a different model if DeepSeek is unavailable
+- Verify your `DEEPSEEK_API_KEY` is correct
+- Check you have sufficient credits at platform.deepseek.com/credits
+- Try a different model if the current one is unavailable
 
 ---
 
