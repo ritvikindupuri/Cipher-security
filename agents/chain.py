@@ -11,9 +11,16 @@ _PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 
 
 def _get_client():
+    use_deepseek = os.environ.get("USE_DEEPSEEK", "").lower() in ("1", "true", "yes")
     use_openrouter = os.environ.get("USE_OPENROUTER", "").lower() in ("1", "true", "yes")
     
-    if use_openrouter:
+    if use_deepseek:
+        from openai import OpenAI
+        return OpenAI(
+            api_key=os.environ.get("DEEPSEEK_API_KEY"),
+            base_url="https://api.deepseek.com",
+        ), "deepseek"
+    elif use_openrouter:
         from openai import OpenAI
         return OpenAI(
             api_key=os.environ.get("OPENROUTER_API_KEY"),
@@ -81,7 +88,6 @@ def _call_streaming(
     out: TextIO | None = None,
     callback: Callable[[str], None] | None = None,
 ) -> str:
-    import httpx
     chunks: list[str] = []
     
     def _safe_write(text: str) -> None:
@@ -106,41 +112,23 @@ def _call_streaming(
                 if callback:
                     callback(text)
     else:
-        with httpx.stream(
-            "POST",
-            f"{os.environ.get('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1')}/chat/completions",
-            headers={
-                "Authorization": f"Bearer {os.environ.get('OPENROUTER_API_KEY')}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": model,
-                "max_tokens": max_tokens,
-                "stream": True,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user_text},
-                ],
-            },
+        stream = client.chat.completions.create(
+            model=model,
+            max_tokens=max_tokens,
+            stream=True,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_text},
+            ],
             timeout=timeout,
-        ) as response:
-            response.raise_for_status()
-            for line in response.iter_lines():
-                if line.startswith("data: "):
-                    data = line[6:]
-                    if data == "[DONE]":
-                        break
-                    try:
-                        import json as json_lib
-                        chunk_data = json_lib.loads(data)
-                        content = chunk_data.get("choices", [{}])[0].get("delta", {}).get("content", "")
-                        if content:
-                            chunks.append(content)
-                            _safe_write(content)
-                            if callback:
-                                callback(content)
-                    except:
-                        pass
+        )
+        for chunk in stream:
+            if chunk.choices and chunk.choices[0].delta.content:
+                text = chunk.choices[0].delta.content
+                chunks.append(text)
+                _safe_write(text)
+                if callback:
+                    callback(text)
     return "".join(chunks).strip()
 
 
@@ -171,9 +159,17 @@ def run_claude_chain(
     out = out or sys.stdout
     err = err or sys.stderr
 
+    use_deepseek = os.environ.get("USE_DEEPSEEK", "").lower() in ("1", "true", "yes")
     use_openrouter = os.environ.get("USE_OPENROUTER", "").lower() in ("1", "true", "yes")
     
-    if use_openrouter:
+    if use_deepseek:
+        api_key = os.environ.get("DEEPSEEK_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "DEEPSEEK_API_KEY is not set. Set USE_DEEPSEEK=1 and add your key to .env"
+            )
+        model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+    elif use_openrouter:
         api_key = os.environ.get("OPENROUTER_API_KEY")
         if not api_key:
             raise RuntimeError(
@@ -184,7 +180,7 @@ def run_claude_chain(
         api_key = os.environ.get("ANTHROPIC_API_KEY")
         if not api_key:
             raise RuntimeError(
-                "ANTHROPIC_API_KEY is not set. Copy .env.example to .env and add your key."
+                "ANTHROPIC_API_KEY is not set. Set USE_DEEPSEEK=1, USE_OPENROUTER=1, or ANTHROPIC_API_KEY in .env"
             )
         model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
 

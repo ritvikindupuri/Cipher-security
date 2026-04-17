@@ -494,59 +494,46 @@ class CipherDashboard {
         const threats = [];
         
         const lines = output.split('\n');
-        let currentItem = null;
         
         for (const line of lines) {
             const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
             
-            if (cleanLine.match(/HYPOTHESIS|Layer B|Scenario/i) && cleanLine.includes(':')) {
-                if (currentItem && currentItem.title) {
-                    threats.push(currentItem);
-                }
-                const parts = cleanLine.split(':');
-                currentItem = {
-                    title: (parts[1] || cleanLine).substring(0, 80).trim(),
-                    severity: cleanLine.toLowerCase().includes('high') || cleanLine.toLowerCase().includes('critical') ? 'high' : 'medium',
-                    mitre: []
-                };
-            }
-            
-            if (currentItem) {
-                const mitreCodes = cleanLine.match(/T\d{4}[\.\d]*/g);
-                if (mitreCodes) {
-                    currentItem.mitre.push(...mitreCodes);
-                }
+            if (cleanLine.match(/risk:|threat:|severity/i)) {
+                let severity = 'medium';
+                if (cleanLine.match(/HIGH|CRITICAL/i)) severity = 'high';
+                else if (cleanLine.match(/LOW/i)) severity = 'low';
                 
-                if (cleanLine.match(/Severity.*HIGH/i)) currentItem.severity = 'high';
-                if (cleanLine.match(/Severity.*MEDIUM/i) && currentItem.severity !== 'high') currentItem.severity = 'medium';
-                
-                if (cleanLine.match(/security relevance|exploit|attack motivation/i) && cleanLine.length > 15) {
-                    currentItem.desc = cleanLine.substring(0, 100);
+                const colonIdx = cleanLine.indexOf(':');
+                if (colonIdx > 0 && colonIdx < cleanLine.length - 10) {
+                    const text = cleanLine.substring(colonIdx + 1).trim();
+                    const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
+                    
+                    if (text.length > 5) {
+                        threats.push({
+                            title: text.substring(0, 80),
+                            severity: severity,
+                            mitre: mitres.slice(0, 3)
+                        });
+                    }
                 }
             }
         }
         
-        if (currentItem && currentItem.title) {
-            threats.push(currentItem);
+        if (threats.length === 0) {
+            const riskLines = lines.filter(l => 
+                l.match(/attack|malicious|suspicious|anomal/i)
+            );
+            riskLines.slice(0, 3).forEach(line => {
+                const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
+                if (cleanLine.length > 15) {
+                    threats.push({
+                        title: cleanLine.substring(0, 80),
+                        severity: 'medium',
+                        mitre: line.match(/T\d{4}[\.\d]*/g) || []
+                    });
+                }
+            });
         }
-        
-        const riskLines = lines.filter(l => 
-            (l.includes('risk') || l.includes('threat') || l.includes('WARNING') || l.includes('concern') || l.includes('anomaly')) &&
-            l.length > 20 &&
-            !l.includes('HYPOTHESIS') &&
-            !l.includes('### ')
-        );
-        
-        riskLines.slice(0, 4).forEach(line => {
-            const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
-            if (cleanLine.length > 15 && !threats.find(t => t.title.includes(cleanLine.substring(0, 30)))) {
-                threats.push({
-                    title: cleanLine.substring(0, 100),
-                    severity: line.toLowerCase().includes('high') || line.includes('WARNING') ? 'high' : 'medium',
-                    mitre: line.match(/T\d{4}[\.\d]*/g) || []
-                });
-            }
-        });
         
         if (threats.length > 0) {
             threatList.innerHTML = threats.slice(0, 6).map(t => `
@@ -554,18 +541,20 @@ class CipherDashboard {
                     <div class="attack-severity ${t.severity}"></div>
                     <div class="attack-content">
                         <div class="attack-title">${this.escapeHtml(t.title)}</div>
-                        ${t.mitre.slice(0, 3).map(m => `<span class="attack-mitre">${m}</span>`).join(' ')}
+                        ${t.mitre.length > 0 ? t.mitre.slice(0, 3).map(m => `<span class="attack-mitre">${m}</span>`).join(' ') : ''}
                     </div>
                 </div>
             `).join('');
         } else {
-            threatList.innerHTML = '<div style="color: var(--text-secondary); font-size: 12px;">Analyzing threat landscape...</div>';
+            threatList.innerHTML = '<div style="color: var(--text-secondary); font-size: 12px;">No significant risks detected. View full analysis in Agent Outputs tab.</div>';
         }
     }
 
     updateScenariosViz(output) {
         const tbody = document.getElementById('scenarioTable');
-        const phases = [
+        const lines = output.split('\n');
+        
+        const mitrePhases = [
             { phase: 'Initial Access', mitre: 'TA0001' },
             { phase: 'Execution', mitre: 'TA0002' },
             { phase: 'Persistence', mitre: 'TA0003' },
@@ -574,81 +563,62 @@ class CipherDashboard {
             { phase: 'C2 / Exfiltration', mitre: 'TA0011/TA0010' }
         ];
         
-        const lines = output.split('\n');
-        const phaseData = {};
-        
-        let currentPhase = null;
-        let currentSection = null;
+        let foundThreats = [];
+        let foundMitres = [];
+        let foundConditions = [];
         
         for (const line of lines) {
             const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
             
-            for (const p of phases) {
-                if (cleanLine.toLowerCase().includes(p.phase.toLowerCase()) && 
-                    (cleanLine.includes('Phase') || cleanLine.includes('Attack'))) {
-                    currentPhase = p.phase;
-                    if (!phaseData[currentPhase]) {
-                        phaseData[currentPhase] = { evidence: [], detection: [], mitre: [] };
-                    }
-                }
-            }
-            
-            if (cleanLine.toLowerCase().includes('artifact') || 
-                cleanLine.toLowerCase().includes('observe') ||
-                cleanLine.toLowerCase().includes('would see')) {
-                currentSection = 'evidence';
-            }
-            if (cleanLine.toLowerCase().includes('detection') || 
-                cleanLine.toLowerCase().includes('monitor') ||
-                cleanLine.toLowerCase().includes('signal') ||
-                cleanLine.toLowerCase().includes('alert')) {
-                currentSection = 'detection';
-            }
-            
-            if (currentPhase && currentSection && cleanLine.length > 10) {
-                const colonIndex = cleanLine.indexOf(':');
-                if (colonIndex > 0 && colonIndex < cleanLine.length - 5) {
-                    const value = cleanLine.substring(colonIndex + 1).trim();
-                    if (value.length > 10) {
-                        if (currentSection === 'evidence' && phaseData[currentPhase].evidence.length < 2) {
-                            phaseData[currentPhase].evidence.push(value.substring(0, 80));
-                        } else if (currentSection === 'detection' && phaseData[currentPhase].detection.length < 2) {
-                            phaseData[currentPhase].detection.push(value.substring(0, 80));
-                        }
-                    }
-                }
-            }
-            
             const mitreMatch = cleanLine.match(/T\d{4}[\.\d]*/g);
-            if (mitreMatch && currentPhase) {
-                phaseData[currentPhase].mitre.push(...mitreMatch);
+            if (mitreMatch) {
+                foundMitres.push(...mitreMatch);
+            }
+            
+            if (cleanLine.match(/severity.*high/i)) {
+                foundThreats.push({ severity: 'HIGH', text: cleanLine.substring(0, 60) });
+            } else if (cleanLine.match(/severity.*medium/i)) {
+                foundThreats.push({ severity: 'MEDIUM', text: cleanLine.substring(0, 60) });
+            }
+            
+            if (cleanLine.match(/condition|threshold|monitor|detect|alert/i) && cleanLine.includes(':')) {
+                const parts = cleanLine.split(':');
+                if (parts.length > 1) {
+                    foundConditions.push(parts[1].trim().substring(0, 80));
+                }
             }
         }
         
-        const rows = phases.map(p => {
-            const data = phaseData[p.phase] || { evidence: [], detection: [], mitre: [] };
-            
-            const evidenceText = data.evidence.length > 0 
-                ? data.evidence.slice(0, 2).join('; ')
-                : 'No specific artifacts identified for this phase in current analysis';
-            
-            const detectionText = data.detection.length > 0
-                ? data.detection.slice(0, 2).join('; ')
-                : 'Monitor for ' + p.phase.toLowerCase() + ' indicators in process and network telemetry';
-            
-            const tacticText = data.mitre.length > 0
-                ? data.mitre.slice(0, 2).join(', ')
-                : 'Under analysis';
-            
-            return `<tr>
-                <td><span class="phase-badge">${p.phase}</span></td>
-                <td><span class="mitre-badge">${p.mitre}</span> ${this.escapeHtml(tacticText.substring(0, 50))}</td>
-                <td>${this.escapeHtml(evidenceText)}</td>
-                <td>${this.escapeHtml(detectionText)}</td>
-            </tr>`;
-        });
-
-        tbody.innerHTML = rows.join('');
+        const threatSummary = foundThreats.length > 0 
+            ? foundThreats.slice(0, 3).map(t => `${t.severity}: ${t.text}`).join('<br>')
+            : 'Review full analysis in Agent Outputs tab';
+        
+        const mitreSummary = foundMitres.length > 0 
+            ? foundMitres.slice(0, 5).map(m => `<span class="mitre-badge">${m}</span>`).join(' ')
+            : 'See Agent Outputs';
+        
+        const detectionSummary = foundConditions.length > 0
+            ? foundConditions.slice(0, 2).join('<br>')
+            : 'Review detection rules in Agent Outputs';
+        
+        tbody.innerHTML = `
+            <tr>
+                <td><span class="phase-badge">Threat Overview</span></td>
+                <td>${mitreSummary}</td>
+                <td>${foundThreats.length} risks identified</td>
+                <td>See Agent Outputs tab for detection rules</td>
+            </tr>
+            <tr>
+                <td><span class="phase-badge">Detection</span></td>
+                <td colspan="2">${detectionSummary}</td>
+                <td>See Agent Outputs tab</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-secondary); font-style: italic;">
+                    View complete MITRE ATT&CK analysis and detection rules in the "Agent Outputs" tab
+                </td>
+            </tr>
+        `;
     }
 
     handleComplete() {
