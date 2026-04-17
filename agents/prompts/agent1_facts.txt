@@ -13,7 +13,7 @@ Review the telemetry JSON and produce a CLEAR, CONCISE analysis that a security 
 Structure your output with clear sections:
 
 ## System Overview
-Quick summary: Host name, OS, uptime, overall health status
+Quick summary: Host name, OS, boot time, overall health status
 
 ## Resource Utilization
 | Resource | Usage | Status |
@@ -33,11 +33,11 @@ List the most resource-intensive processes with PID and memory usage.
 ## Security Observations
 List any items that warrant attention (1-5 bullet points max). Focus on:
 - Unusual processes
-- Unexpected network connections
+- Unexpected network connections  
 - High resource usage
 - Missing security tools
 
-## Data Source
-> JSON paths: snapshot.hostname, snapshot.cpu, snapshot.memory, snapshot.processes, snapshot.network_connections
+## Data Source Reference
+> JSON paths: snapshot.host, snapshot.cpu.usage_percent_interval_0_5s, snapshot.memory.virtual, snapshot.disks, snapshot.processes, snapshot.network_connections, snapshot.network_io
 
 Keep this concise - analysts need quick insights, not a full report.
