@@ -49,7 +49,7 @@ The LoggingCollector module uses psutil to execute system calls for cpu_percent,
 
 **Layer 2: AI Processing**
 
-The Agent Chain sends telemetry to three DeepSeek LLM instances. Agent 1 (Observations) extracts factual observations from raw data. Agent 2 (Threats) maps attack surface and risks. Agent 3 (Detection Engineering) generates actionable detection rules and SIEM queries. All responses stream token-by-token to the dashboard.
+The Agent Chain sends telemetry to three AI agent instances. Agent 1 (Observations) extracts factual observations from raw data. Agent 2 (Threats) maps attack surface and risks. Agent 3 (Detection Engineering) generates actionable detection rules and SIEM queries. All responses stream token-by-token to the dashboard.
 
 **Layer 3: Dashboard Display**
 
@@ -68,7 +68,7 @@ ReportLab generates professional PDF reports containing system overview, telemet
 | Backend | Python 3.10+ | Core logic and processing |
 | Web Server | Flask | HTTP API and SSE streaming |
 | Telemetry | psutil | System metrics collection |
-| AI Provider | DeepSeek API | Language model analysis |
+| AI Provider | Anthropic Claude | Language model analysis |
 | Frontend | Vanilla JS | Dashboard interface |
 | Styling | CSS (Apple Design) | Modern UI |
 | PDF | ReportLab | Report generation |
@@ -99,74 +99,68 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### Step 4: Get Your DeepSeek API Key
+### Step 4: Get Your Anthropic API Key
 
-Scry uses DeepSeek's official API for AI analysis. Here's how to get your API key:
+Scry uses Anthropic's Claude AI for security analysis. Here's how to get your API key:
 
-**4.1 Create a DeepSeek Account**
-1. Go to https://platform.deepseek.com
-2. Click "Sign Up" in the top-right corner
-3. You can sign up with Google, GitHub, or email/password
+**4.1 Create an Anthropic Account**
+1. Go to https://console.anthropic.com
+2. Click "Sign Up" 
+3. You can sign up with Google, or email/password
 4. Verify your email if required
 
 **4.2 Access the API Keys Section**
-1. After logging in, go to https://platform.deepseek.com/api_keys
-2. Or click on your profile icon and select "API Keys"
+1. After logging in, go to https://console.anthropic.com/keys
+2. Click "Create Key"
 
 **4.3 Create Your API Key**
-1. Click the "Create API Key" button
-2. Enter a name for your key (e.g., "Scry Security Analysis")
+1. Enter a name for your key (e.g., "Scry Security Analysis")
+2. Select appropriate permissions (default is fine)
 3. Click "Create"
 4. **Important:** Copy the API key immediately - it will only be shown once
-5. The key starts with `sk-` (e.g., `sk-58c247c59f8c43c49c92ec00b8e852ea`)
+5. The key starts with `sk-ant-api03-`
 
-**4.4 Add Credits to Your Account**
-1. Go to https://platform.deepseek.com/credits
-2. Click "Add credits"
-3. Choose an amount - DeepSeek is very affordable:
-   - DeepSeek Chat (deepseek-chat): ~$0.001 per 1K tokens
-   - DeepSeek Reasoner (deepseek-reasoner): ~$0.001 per 1K tokens
-   - **$1-2 credits typically covers hundreds of analyses**
-4. Complete the payment
+**4.4 Understand the Available Models**
 
-**4.5 Understand the Model Options**
-
-The app uses DeepSeek's chat model. Available models:
+Scry supports Claude models:
 
 | Model | Model ID | Cost | Best For |
 |-------|----------|------|----------|
-| DeepSeek Chat | `deepseek-chat` | ~$0.50/1M tokens | **Recommended** - Fast, balanced |
-| DeepSeek Reasoner | `deepseek-reasoner` | ~$0.50/1M tokens | Better reasoning, slower |
+| Claude Sonnet | `claude-sonnet-4-20250514` | $3/M input, $15/M output | **Recommended** - Fast, balanced |
+| Claude Opus | `claude-opus-4-20250514` | $15/M input, $75/M output | Best reasoning, higher cost |
 
 ### Step 5: Configure Environment
 
-Create a `.env` file in the project root with your DeepSeek configuration:
+Create a `.env` file in the project root with your Anthropic configuration:
 
 ```bash
-# Enable DeepSeek API (required)
-USE_DEEPSEEK=1
+# Enable Anthropic API (required)
+ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
 
-# Your DeepSeek API key (paste your key here)
-DEEPSEEK_API_KEY=sk-your-key-here
-
-# Model selection (deepseek-chat is recommended)
-DEEPSEEK_MODEL=deepseek-chat
+# Model selection (Sonnet is recommended)
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
 ```
 
-Example with a real key:
+Example:
 ```bash
-USE_DEEPSEEK=1
-DEEPSEEK_API_KEY=sk-58c247c59f8c43c49c92ec00b8e852ea
-DEEPSEEK_MODEL=deepseek-chat
+ANTHROPIC_API_KEY=sk-ant-api03-bsJI6bbC1nzPJMkCPKuo...
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
 ```
 
 **How the App Uses These Variables:**
-- `USE_DEEPSEEK=1` tells the app to use DeepSeek's API
-- `DEEPSEEK_API_KEY` authenticates your requests to DeepSeek's servers
-- `DEEPSEEK_MODEL` specifies which DeepSeek model to use for all three agents
+- `ANTHROPIC_API_KEY` authenticates your requests to Anthropic's servers
+- `ANTHROPIC_MODEL` specifies which Claude model to use for all three agents
+
+**Alternative: Using DeepSeek**
+If you prefer DeepSeek instead, you can use:
+```bash
+USE_DEEPSEEK=1
+DEEPSEEK_API_KEY=sk-your-key-here
+DEEPSEEK_MODEL=deepseek-chat
+```
 
 **Alternative: Using OpenRouter**
-If you prefer OpenRouter instead, you can use:
+OpenRouter provides another alternative:
 ```bash
 USE_OPENROUTER=1
 OPENROUTER_API_KEY=sk-or-v1-your-key-here
@@ -254,17 +248,17 @@ The app is designed to be a **security analyst tool**, not a threat generator. I
 ## Troubleshooting
 
 **Agent gets stuck on "Running..."**
-- Check your DeepSeek API key is valid
-- Ensure you have credits in your DeepSeek account at platform.deepseek.com/credits
-- DeepSeek API may be rate-limited during high traffic
+- Check your Anthropic API key is valid
+- Ensure you have credits in your Anthropic account at console.anthropic.com
+- Claude API may be rate-limited during high traffic
 
 **No data in visualizations**
 - Make sure you're running on Windows
 - Check telemetry collection completed successfully in Command Log
 
 **API Errors**
-- Verify your `DEEPSEEK_API_KEY` is correct
-- Check you have sufficient credits at platform.deepseek.com/credits
+- Verify your `ANTHROPIC_API_KEY` is correct
+- Check you have sufficient credits at console.anthropic.com
 - Try a different model if the current one is unavailable
 
 ---
