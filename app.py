@@ -198,6 +198,10 @@ def stream():
                 item = PROGRESS_QUEUE.get(timeout=60)
                 yield f"data: {json.dumps(item, default=str)}\n\n"
                 
+                # Small delay for agent chunks to moderate streaming speed
+                if item.get("type") == "agent_chunk":
+                    time.sleep(0.02)  # 20ms delay between chunks
+                
                 if item.get("type") == "complete" or item.get("type") == "error":
                     break
             except queue.Empty:
