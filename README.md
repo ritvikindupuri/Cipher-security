@@ -16,7 +16,7 @@ Threats are automatically mapped to the MITRE ATT&CK framework, so you see not j
 Scry continuously monitors your Windows machine, collecting CPU usage, memory allocation, disk utilization, network connections, and running processes. Every data point is traceable to its source system call, giving you confidence that what you see is what's actually happening.
 
 **AI-Powered Threat Analysis**
-Three specialized agents work together to analyze your telemetry. The Observation Agent extracts factual findings from raw data. The Threat Agent maps these findings to potential attack vectors and vulnerabilities. The Scenario Agent synthesizes everything into actionable defensive strategies. Each agent builds on the previous one, creating a complete picture from raw numbers.
+Three specialized agents work together to analyze your telemetry. The Observation Agent extracts factual findings from raw data. The Threat Agent maps attack surface and potential risks. The Detection Engineering Agent generates actionable detection rules and hunting queries. Each agent builds on the previous one, creating a complete picture from raw numbers.
 
 **MITRE ATT&CK Framework Integration**
 Threats don't exist in a vacuum - Scry automatically maps detected patterns to the industry-standard MITRE ATT&CK framework. You see not just what might be wrong, but how it fits into known attack patterns, from initial access through data exfiltration.
@@ -49,7 +49,7 @@ The LoggingCollector module uses psutil to execute system calls for cpu_percent,
 
 **Layer 2: AI Processing**
 
-The Agent Chain sends telemetry to three DeepSeek LLM instances via OpenRouter. Agent 1 (Observations) extracts factual observations from raw data. Agent 2 (Threats) maps attack surface from Agent 1 output plus original telemetry. Agent 3 (Scenarios) generates defensive scenarios from both prior outputs with MITRE ATT&CK mapping. All responses stream token-by-token to the dashboard.
+The Agent Chain sends telemetry to three DeepSeek LLM instances. Agent 1 (Observations) extracts factual observations from raw data. Agent 2 (Threats) maps attack surface and risks. Agent 3 (Detection Engineering) generates actionable detection rules and SIEM queries. All responses stream token-by-token to the dashboard.
 
 **Layer 3: Dashboard Display**
 
@@ -198,19 +198,20 @@ Navigate to http://127.0.0.1:5000
 - CPU, memory, disk usage metrics
 - Running processes and their resource usage
 - Network connections and listening ports
-- Potential anomalies in system state
+- System overview and health status
 
 **Threat Agent** maps the attack surface:
-- Identifies processes with network access
-- Flags unusual network connections
-- Maps observations to potential attack vectors
-- Uses MITRE ATT&CK framework for classification
+- Identifies exposed services and listening ports
+- Analyzes network connections (internal vs external)
+- Assesses process risks and network-accessible processes
+- Provides honest assessment of what CAN vs CANNOT be determined
 
-**Scenario Agent** generates defensive scenarios:
-- Creates hypothetical attack chains based on observations
-- Maps each phase to MITRE tactics and techniques
-- Provides detection signals for each phase
-- Suggests investigation and mitigation steps
+**Detection Engineering Agent** generates actionable detection rules:
+- Ranks MITRE ATT&CK techniques by relevance to this system
+- Provides concrete detection rules with log sources and conditions
+- Generates SIEM/hunting queries ready to use
+- Lists indicators to watch (files, network, processes)
+- Recommends prioritized next steps for the security team
 
 ### MITRE ATT&CK Framework
 
