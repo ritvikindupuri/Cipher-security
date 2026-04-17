@@ -108,12 +108,67 @@ class CipherDashboard {
         
         if (output && output.length > 0) {
             outputEl.classList.remove('loading');
-            outputEl.textContent = output;
+            outputEl.innerHTML = this.renderMarkdown(output);
         } else {
             outputEl.classList.add('loading');
             const agentNames = { observations: 'Observations', threats: 'Threats', scenarios: 'Scenarios' };
             outputEl.textContent = 'Awaiting ' + agentNames[this.currentFullOutputTab] + ' output...';
         }
+    }
+
+    renderMarkdown(text) {
+        if (!text) return '';
+        
+        let html = this.escapeHtml(text);
+        
+        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+        
+        html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        
+        html = html.replace(/^\> (.+)$/gm, '<blockquote>$1</blockquote>');
+        
+        html = html.replace(/^\| (.+) \|$/gm, (match) => {
+            const cells = match.slice(1, -1).split('|').map(c => c.trim());
+            if (cells.some(c => /^-+$/.test(c))) return '';
+            return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+        });
+        
+        const tableMatch = html.match(/(<tr>.*<\/tr>\s*)+/g);
+        if (tableMatch) {
+            tableMatch.forEach(table => {
+                html = html.replace(table, `<table>${table}</table>`);
+            });
+        }
+        
+        html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+        html = html.replace(/(<li>.*<\/li>\s*)+/g, '<ul>$&</ul>');
+        
+        html = html.replace(/^---$/gm, '<hr>');
+        
+        html = html.replace(/\n\n/g, '</p><p>');
+        html = '<p>' + html + '</p>';
+        html = html.replace(/<p><(h[1-3]|ul|ol|table|pre|blockquote|hr)/g, '<$1');
+        html = html.replace(/<\/(h[1-3]|ul|ol|table|pre|blockquote)><\/p>/g, '</$1>');
+        html = html.replace(/<p><hr><\/p>/g, '<hr>');
+        html = html.replace(/<p><blockquote>/g, '<blockquote>');
+        html = html.replace(/<\/blockquote><\/p>/g, '</blockquote>');
+        html = html.replace(/<p>\s*<\/p>/g, '');
+        html = html.replace(/<hr><\/p>/g, '<hr>');
+        
+        return html;
+    }
+
+    escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     getTimestamp() {

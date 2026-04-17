@@ -755,19 +755,19 @@
         }
 
         .full-outputs-section {
-            background: var(--bg-secondary);
+            background: var(--bg);
             padding: 16px;
             flex: 1;
             min-height: 0;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         .full-outputs-tabs {
             display: flex;
             gap: 4px;
-            margin: 12px 0;
+            margin-bottom: 12px;
+            flex-shrink: 0;
         }
 
         .full-output-tab {
@@ -782,33 +782,88 @@
         }
 
         .full-output-tab:hover { background: var(--bg-tertiary); color: var(--text); }
-        .full-output-tab.active { background: var(--text); color: white; }
+        .full-output-tab.active { background: var(--accent); color: white; }
 
         .full-output-content {
             flex: 1;
-            overflow: hidden;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            background: #1a1a1a;
+            border-radius: 12px;
+            background: var(--bg);
+            overflow: auto;
+            min-height: 0;
         }
 
         .full-output-text {
-            color: #e0e0e0;
-            font-size: 12px;
-            line-height: 1.7;
-            padding: 16px;
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.8;
+            padding: 20px;
             margin: 0;
             white-space: pre-wrap;
             word-wrap: break-word;
-            font-family: "SF Mono", "Menlo", "Consolas", monospace;
-            overflow-y: auto;
-            height: 100%;
-            max-height: 45vh;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
         }
 
         .full-output-text.loading {
             color: var(--text-secondary);
             font-style: italic;
+        }
+
+        .full-output-text h1 { font-size: 20px; font-weight: 700; margin: 0 0 16px 0; color: var(--text); }
+        .full-output-text h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px 0; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+        .full-output-text h3 { font-size: 14px; font-weight: 600; margin: 16px 0 8px 0; color: var(--text); }
+        .full-output-text p { margin: 0 0 12px 0; }
+        .full-output-text ul, .full-output-text ol { margin: 0 0 12px 20px; }
+        .full-output-text li { margin-bottom: 6px; }
+        .full-output-text strong { font-weight: 600; color: var(--text); }
+        .full-output-text em { font-style: italic; color: var(--text-secondary); }
+        .full-output-text code { 
+            background: var(--bg-tertiary); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-family: "SF Mono", "Menlo", monospace; 
+            font-size: 12px;
+        }
+        .full-output-text pre { 
+            background: #1a1a1a; 
+            color: #e0e0e0;
+            padding: 16px; 
+            border-radius: 8px; 
+            overflow-x: auto;
+            margin: 12px 0;
+            font-family: "SF Mono", "Menlo", monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .full-output-text table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 12px;
+        }
+        .full-output-text th {
+            background: var(--bg-tertiary);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+        .full-output-text td {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+        }
+        .full-output-text tr:nth-child(even) { background: var(--bg-secondary); }
+        .full-output-text blockquote {
+            border-left: 3px solid var(--accent);
+            margin: 12px 0;
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+        .full-output-text hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 20px 0;
         }
     </style>
 </head>
