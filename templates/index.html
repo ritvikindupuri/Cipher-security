@@ -587,26 +587,26 @@
         .legend-dot.network { background: var(--orange); }
 
         /* Process Table */
-        .process-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.process-table { width: 100%; border-collapse: collapse; font-size: 11px; }
 
         .process-table th {
             text-align: left;
             padding: 8px;
-            background: var(--bg-tertiary);
+            background: #1a1a24;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: #888;
             text-transform: uppercase;
             font-size: 9px;
-            letter-spacing: 0.5px;
+            border-bottom: 1px solid #333;
         }
 
-        .process-table td { padding: 8px; border-bottom: 1px solid var(--border); word-break: break-word; }
-        .process-table tr:hover { background: var(--bg-secondary); }
-        .process-name { font-weight: 500; }
-        .process-pid { font-family: monospace; color: var(--text-secondary); }
-        .process-memory { font-weight: 600; color: var(--accent); }
+        .process-table td { padding: 8px; border-bottom: 1px solid #333; word-break: break-word; color: #ccc; }
+        .process-table tr:hover { background: #1a1a24; }
+        
+        .process-name { font-weight: 600; color: #e0e0e0; }
+        .process-pid { font-family: monospace; color: #888; }
+        .process-memory { font-weight: 600; color: #00ff88; }
 
-        /* Attack List */
         .attack-list { display: flex; flex-direction: column; gap: 8px; }
 
         .attack-item {
@@ -644,15 +644,16 @@
         .scenario-table th {
             text-align: left;
             padding: 10px;
-            background: var(--bg-tertiary);
+            background: #1a1a24;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: #888;
             text-transform: uppercase;
             font-size: 9px;
             letter-spacing: 0.5px;
+            border-bottom: 1px solid #333;
         }
 
-        .scenario-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: top; word-break: break-word; }
+        .scenario-table td { padding: 10px; border-bottom: 1px solid #333; vertical-align: top; word-break: break-word; color: #ccc; }
 
         .phase-badge {
             display: inline-block;
@@ -818,7 +819,7 @@
         }
         .full-output-text li {
             margin: 4px 0;
-            color: #aaa;
+            color: #cccccc;
             line-height: 1.5;
         }
         .full-output-text hr {
