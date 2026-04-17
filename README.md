@@ -228,6 +228,29 @@ The app maps security observations to MITRE ATT&CK tactics:
 
 ---
 
+## Agent Design Principles
+
+Each agent is designed for accuracy and honesty:
+
+### Agent 1: Observation Agent
+- References actual JSON paths from the telemetry schema
+- Only describes what exists in the data
+- Never speculates beyond the observed metrics
+
+### Agent 2: Threat Agent
+- Explicitly states what CAN vs CANNOT be determined from data
+- Won't fabricate threats that don't exist in the observations
+- Provides honest assessment of observable attack surface only
+
+### Agent 3: Detection Engineering Agent
+- Generates actual detection rules based on identified risks
+- Creates SIEM/hunting queries from real telemetry
+- Provides indicators and next steps grounded in actual observations
+
+The app is designed to be a **security analyst tool**, not a threat generator. It tells you what it sees, what risks are observable, and how to detect them - nothing more.
+
+---
+
 ## Troubleshooting
 
 **Agent gets stuck on "Running..."**
