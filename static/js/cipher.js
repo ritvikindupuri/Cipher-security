@@ -610,98 +610,75 @@ class CipherDashboard {
         const tbody = document.getElementById('scenarioTable');
         const lines = output.split('\n');
         
-        const phases = [];
-        let currentPhase = null;
-        let currentSection = '';
-        let threatName = '';
-        let threatSeverity = '';
-        let currentDetection = '';
+        const priorities = [];
+        const detectionRules = [];
+        const indicators = [];
+        let currentRule = null;
+        let nextSteps = [];
         
         for (const line of lines) {
             const cleanLine = line.replace(/^[\s\-\*\>\#\|]+/, '').trim();
             
-            if (cleanLine.match(/\*\*Threat Name:\*\*/i)) {
-                threatName = cleanLine.replace(/\*\*/g, '').replace(/Threat Name:/i, '').trim();
-            }
-            
-            if (cleanLine.match(/\*\*Severity:\*\*/i)) {
-                const sev = cleanLine.replace(/\*\*/g, '').replace(/Severity:/i, '').trim().toUpperCase();
-                threatSeverity = sev;
-            }
-            
-            if (cleanLine.match(/\|.*\|.*\|.*\|/)) {
-                const cells = cleanLine.split('|').map(c => c.trim()).filter(c => c && !c.match(/^-+$/));
+            if (cleanLine.match(/\|.*TA\d{4}.*\||Priority.*Technique/)) {
+                const cells = cleanLine.split('|').map(c => c.trim()).filter(c => c && !c.match(/^-+$/) && !c.match(/Priority|Technique|Tactic|Why Relevant/i));
                 if (cells.length >= 3) {
-                    const phaseMatch = cells.find(c => c.match(/TA\d{4}/));
-                    const tacticMatch = cells.find(c => c.match(/Initial|Execution|Persistence|Privilege|Defense|Command|Exfiltration|Impact/i));
-                    const techniqueMatch = cells.find(c => c.match(/T\d{4}/));
-                    const evidenceMatch = cells[cells.length - 1];
-                    
-                    if (phaseMatch || tacticMatch) {
-                        phases.push({
-                            phase: tacticMatch || 'Attack Phase',
-                            technique: techniqueMatch || cells[1] || '',
-                            evidence: evidenceMatch || '',
-                            detection: ''
-                        });
-                    }
+                    priorities.push({
+                        priority: cells[0],
+                        technique: cells.find(c => c.match(/T\d{4}/)) || cells[1] || '',
+                        tactic: cells.find(c => c.match(/TA\d{4}/)) || '',
+                        reason: cells[cells.length - 1] || ''
+                    });
                 }
             }
             
-            if (cleanLine.match(/\*\*What attacker does:\*\*/i)) {
-                currentSection = 'attacker';
+            if (cleanLine.match(/\*\*Detection Rule \d+:/i) || cleanLine.match(/^\*\*[A-Za-z ]+Rule/i)) {
+                if (currentRule) detectionRules.push(currentRule);
+                const name = cleanLine.replace(/\*\*/g, '').replace(/:/g, '').trim();
+                currentRule = { name: name, monitor: '', condition: '' };
             }
-            if (cleanLine.match(/\*\*What we observe:\*\*/i)) {
-                currentSection = 'observe';
-                if (phases.length > 0) {
-                    phases[phases.length - 1].detection = cleanLine.replace(/\*\*/g, '').replace(/What we observe:/i, '').trim();
+            
+            if (currentRule) {
+                if (cleanLine.match(/\*\*What to monitor:\*\*/i)) {
+                    currentRule.monitor = cleanLine.replace(/\*\*/g, '').replace(/What to monitor:/i, '').trim();
+                }
+                if (cleanLine.match(/\*\*Condition:\*\*/i)) {
+                    currentRule.condition = cleanLine.replace(/\*\*/g, '').replace(/Condition:/i, '').trim();
                 }
             }
-            if (cleanLine.match(/\*\*How to detect:\*\*/i)) {
-                currentSection = 'detect';
-                if (phases.length > 0) {
-                    phases[phases.length - 1].detection = cleanLine.replace(/\*\*/g, '').replace(/How to detect:/i, '').trim();
-                }
+            
+            if (cleanLine.match(/^\d+\.\s+\[/)) {
+                nextSteps.push(cleanLine);
             }
         }
         
-        if (phases.length > 0) {
-            tbody.innerHTML = phases.slice(0, 5).map(p => `
+        if (currentRule) detectionRules.push(currentRule);
+        
+        const mitres = [];
+        for (const line of lines) {
+            const matches = line.match(/T\d{4}[\.\d]*/g);
+            if (matches) mitres.push(...matches);
+        }
+        
+        if (priorities.length > 0) {
+            tbody.innerHTML = priorities.slice(0, 5).map(p => `
                 <tr>
-                    <td><span class="phase-badge">${this.escapeHtml(p.phase)}</span></td>
+                    <td><span class="phase-badge" style="background: ${p.priority === '1' ? '#ff3b30' : p.priority === '2' ? '#ff9500' : '#34c759'};">P${p.priority}</span></td>
                     <td>${p.technique ? `<span class="mitre-badge">${this.escapeHtml(p.technique)}</span>` : '-'}</td>
-                    <td style="font-size: 10px; max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(p.evidence || '-')}</td>
-                    <td style="font-size: 10px; max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(p.detection || '-')}</td>
+                    <td>${p.reason ? this.escapeHtml(p.reason.substring(0, 60)) : '-'}</td>
+                    <td style="font-size: 10px;">${detectionRules.length} rules</td>
                 </tr>
             `).join('');
         } else {
-            const mitres = [];
-            for (const line of lines) {
-                const matches = line.match(/T\d{4}[\.\d]*/g);
-                if (matches) mitres.push(...matches);
-            }
-            
-            const tactics = [];
-            for (const line of lines) {
-                const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
-                if (cleanLine.match(/Initial Access|Execution|Persistence|Privilege Escalation|Defense Evasion|Discovery|Lateral Movement|Collection|Command and Control|Exfiltration|Impact/i)) {
-                    const match = cleanLine.match(/(TA\d{4})?\s*(Initial Access|Execution|Persistence|Privilege Escalation|Defense Evasion|Discovery|Lateral Movement|Collection|Command and Control|Exfiltration|Impact)/i);
-                    if (match) {
-                        tactics.push(match[2]);
-                    }
-                }
-            }
-            
             tbody.innerHTML = `
                 <tr>
                     <td colspan="4" style="padding: 20px;">
                         <div style="margin-bottom: 16px;">
-                            <strong style="font-size: 14px;">${this.escapeHtml(threatName || 'Threat Analysis')}</strong>
-                            ${threatSeverity ? `<span style="margin-left: 12px; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: ${threatSeverity.includes('HIGH') || threatSeverity.includes('CRIT') ? '#ff3b30' : threatSeverity.includes('LOW') ? '#34c759' : '#ff9500'}; color: white;">${threatSeverity}</span>` : ''}
+                            <strong style="font-size: 14px;">Detection Engineering</strong>
                         </div>
-                        ${tactics.length > 0 ? `<div style="margin-bottom: 8px;"><span style="color: var(--text-secondary); font-size: 11px;">MITRE Tactics:</span> ${tactics.slice(0, 4).map(t => `<span class="mitre-badge" style="margin-left: 4px;">${t}</span>`).join('')}</div>` : ''}
-                        ${mitres.length > 0 ? `<div style="margin-bottom: 8px;"><span style="color: var(--text-secondary); font-size: 11px;">Techniques:</span> ${mitres.slice(0, 5).map(m => `<span class="mitre-badge" style="margin-left: 4px;">${m}</span>`).join('')}</div>` : ''}
-                        <div style="color: var(--text-secondary); font-size: 11px; margin-top: 12px;">View complete attack chain and detection rules in the Agent Outputs tab.</div>
+                        ${mitres.length > 0 ? `<div style="margin-bottom: 12px;"><span style="color: var(--text-secondary); font-size: 11px;">Techniques to Monitor:</span><br>${mitres.slice(0, 6).map(m => `<span class="mitre-badge" style="margin: 2px;">${m}</span>`).join(' ')}</div>` : ''}
+                        ${detectionRules.length > 0 ? `<div style="margin-bottom: 8px;"><span style="color: var(--text-secondary); font-size: 11px;">Detection Rules Generated:</span> ${detectionRules.length}</div>` : ''}
+                        ${nextSteps.length > 0 ? `<div><span style="color: var(--text-secondary); font-size: 11px;">Recommended Actions:</span><ol style="margin: 8px 0 0 16px; font-size: 11px;">${nextSteps.slice(0, 3).map(s => `<li>${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 80))}</li>`).join('')}</ol></div>` : ''}
+                        <div style="color: var(--text-secondary); font-size: 11px; margin-top: 12px;">View complete detection rules and queries in the Agent Outputs tab.</div>
                     </td>
                 </tr>
             `;
