@@ -482,6 +482,14 @@ class CipherDashboard {
             document.getElementById('metricDisk').textContent = val + '%';
         }
         
+        const netMatch = output.match(/(?:Network|Connections|Listening Ports)[:\s]*(\d+)/i);
+        if (netMatch) {
+            const val = netMatch[1];
+            document.getElementById('metricNet').textContent = val;
+            document.getElementById('chartNet').style.width = Math.min(val, 100) + '%';
+            document.getElementById('chartNetVal').textContent = val;
+        }
+        
         const processTable = document.getElementById('processTable');
         const processRows = [];
         const lines = output.split('\n');
