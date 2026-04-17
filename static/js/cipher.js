@@ -126,6 +126,7 @@ class CipherDashboard {
         html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
         
         html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+            const label = lang ? lang.toUpperCase() : 'QUERY';
             return `<pre><code>${code}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>`;
         });
         html = html.replace(/`([^`]+)`/g, '<code>$1</code>');

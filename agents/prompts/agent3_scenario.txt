@@ -39,49 +39,27 @@ Write concrete detection rules the analyst can use TODAY:
 
 ## SIEM/Log Query Examples
 
-Provide ready-to-use queries:
+For each query, provide ONE separate code block. Label each with the platform it runs on:
 
-```sql
--- Query 1: [Description]
-[SIEM query here]
-
--- Query 2: [Description]  
-[SIEM query here]
+### Splunk (SPL)
+```splunk
+index=windows EventCode=4688 | search ProcessName="suspicious.exe"
 ```
 
----
+### Microsoft Sentinel (KQL)
+```kql
+SecurityEvent | where Process == "suspicious.exe"
+```
 
-## File Indicators (If Applicable)
+### Elastic (Lucene)
+```lucene
+process.name:suspicious.exe AND event.code:4688
+```
 
-From the telemetry, watch for these:
-- Filenames: [list]
-- Paths: [list]
-- Hashes: [list if available]
-
----
-
-## Network Indicators
-
-From the telemetry, monitor these connections:
-- Suspicious IPs: [list or "None identified"]
-- Unusual ports: [list]
-- Domains to block: [list]
-
----
-
-## Process Monitoring
-
-Key processes to watch:
-- **Process name:** [what to look for]
-- **Parent-child relationships:** [suspicious chains]
-- **Command line patterns:** [what bad command lines look like]
-
----
-
-## Threat Hunting Queries
-
-Proactive searches to find IOCs:
-1. [Hunting query with description]
+### GrayLog / QRadar
+```sql
+SELECT * FROM windows_events WHERE process_name = 'suspicious.exe'
+```
 
 ---
 
