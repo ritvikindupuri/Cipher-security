@@ -776,10 +776,10 @@ class CipherDashboard {
         this.showToast('Downloading report...');
     }
 
-    showToast(message) {
+    showToast(message, type = 'info') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
-        toast.className = 'toast';
+        toast.className = 'toast' + (type === 'error' ? ' error-toast' : '');
         toast.textContent = message;
         container.appendChild(toast);
 
