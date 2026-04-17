@@ -23,9 +23,9 @@
             --orange: #ff9500;
             
             /* Dark theme for command log */
-            --log-bg: #0a0a0f;
-            --log-text: #e0e0e0;
-            --log-text-dim: #888;
+            --log-bg: #f5f5f7;
+            --log-text: #1d1d1f;
+            --log-text-dim: #666;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -127,20 +127,20 @@
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
         .metric-card {
-            background: #1a1a24;
+            background: #ffffff;
             padding: 12px;
             border-radius: 10px;
-            border: 1px solid #333;
+            border: 1px solid #ddd;
             cursor: help;
             transition: background 0.2s;
         }
         .metric-card:hover {
-            background: #252530;
-            border-color: #444;
+            background: #f5f5f5;
+            border-color: #bbb;
         }
 
-        .metric-value { font-size: 20px; font-weight: 600; color: #ffffff; }
-        .metric-label { font-size: 11px; color: #888; margin-top: 2px; }
+        .metric-value { font-size: 20px; font-weight: 600; color: #000000; }
+        .metric-label { font-size: 11px; color: #666; margin-top: 2px; }
 
         .steps { display: flex; flex-direction: column; gap: 4px; }
 
@@ -253,32 +253,51 @@
         .log-header-block.success .header-text { color: var(--success); }
         .log-header-block.error .header-text { color: var(--error); }
 
-        .log-entry {
+.log-entry {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 10px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin-bottom: 4px;
-            background: rgba(255,255,255,0.02);
-            border-left: 3px solid transparent;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.5);
+            border-bottom: 1px solid #eee;
         }
+        .log-entry:hover {
+            background: rgba(0,0,0,0.02);
+        }
+
+        .log-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #888;
+            margin-left: auto;
+        }
+
+        .log-message {
+            color: #1d1d1f;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .log-entry.error .log-message { color: #ff3b30; font-weight: 500; }
+        .log-entry.info .log-message { color: #0071e3; }
+        .log-entry.success .log-message { color: #34c759; }
+        
+        .log-entry.exec .log-message { color: #000; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; font-weight: 600; }
+        .log-entry.output .log-message { color: #0071e3; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
 
         .log-entry:hover {
             background: rgba(255,255,255,0.05);
         }
 
-        .log-entry.info { border-left-color: var(--accent); }
+.log-entry.info { border-left-color: var(--accent); }
         .log-entry.success { border-left-color: var(--success); }
         .log-entry.command { border-left-color: #f59e0b; }
+        
         .log-entry.exec { border-left-color: #10b981; background: rgba(16, 185, 129, 0.1); }
-        .log-entry.exec .log-message { color: #ffffff; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
-        
         .log-entry.output { border-left-color: #6b7280; background: rgba(107, 114, 128, 0.1); }
-        .log-entry.output .log-message { color: #00ff88; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
-.log-entry.error { border-left-color: var(--error); background: rgba(239, 68, 68, 0.15); }
         
-        .log-entry.error .log-message { color: #ff6b6b; font-weight: 500; }
+        .log-entry.error { border-left-color: var(--error); background: rgba(239, 68, 68, 0.15); }
         
         .log-message {
             color: var(--log-text);
@@ -286,6 +305,8 @@
             word-break: break-word;
         }
 
+        .log-entry.error .log-message { color: #ff3b30; font-weight: 500; }
+        
         .log-block {
             margin: 12px 0;
             border-radius: 8px;
@@ -592,20 +613,20 @@
         .process-table th {
             text-align: left;
             padding: 8px;
-            background: #1a1a24;
+            background: #eaeaeb;
             font-weight: 600;
-            color: #888;
+            color: #666;
             text-transform: uppercase;
             font-size: 9px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #ddd;
         }
 
-        .process-table td { padding: 8px; border-bottom: 1px solid #333; word-break: break-word; color: #ccc; }
-        .process-table tr:hover { background: #1a1a24; }
+        .process-table td { padding: 8px; border-bottom: 1px solid #ddd; word-break: break-word; color: #1d1d1f; }
+        .process-table tr:hover { background: #f5f5f7; }
         
-        .process-name { font-weight: 600; color: #e0e0e0; }
-        .process-pid { font-family: monospace; color: #888; }
-        .process-memory { font-weight: 600; color: #00ff88; }
+        .process-name { font-weight: 600; color: #1d1d1f; }
+        .process-pid { font-family: monospace; color: #666; }
+        .process-memory { font-weight: 600; color: #0071e3; }
 
         .attack-list { display: flex; flex-direction: column; gap: 8px; }
 
@@ -644,16 +665,16 @@
         .scenario-table th {
             text-align: left;
             padding: 10px;
-            background: #1a1a24;
+            background: #eaeaeb;
             font-weight: 600;
-            color: #888;
+            color: #666;
             text-transform: uppercase;
             font-size: 9px;
             letter-spacing: 0.5px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #ddd;
         }
 
-        .scenario-table td { padding: 10px; border-bottom: 1px solid #333; vertical-align: top; word-break: break-word; color: #ccc; }
+        .scenario-table td { padding: 10px; border-bottom: 1px solid #ddd; vertical-align: top; word-break: break-word; color: #1d1d1f; }
 
         .phase-badge {
             display: inline-block;
@@ -787,7 +808,7 @@
         }
 
         .full-output-text {
-            color: #e0e0e0;
+            color: #1d1d1f;
             font-size: 13px;
             line-height: 1.8;
             padding: 20px;
@@ -797,33 +818,48 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
         }
 
-        .full-output-text.loading {
-            color: #888;
-            font-style: italic;
-        }
+        .full-output-text h1 { font-size: 20px; font-weight: 700; margin: 0 0 16px 0; color: #000; }
+        .full-output-text h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px 0; color: #000; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+        .full-output-text h3 { font-size: 14px; font-weight: 600; margin: 16px 0 8px 0; color: #000; }
+        .full-output-text strong { font-weight: 600; color: #000; }
+        .full-output-text em { font-style: italic; color: #666; }
 
-.full-output-text h1 { font-size: 20px; font-weight: 700; margin: 0 0 16px 0; color: #ffffff; }
-        .full-output-text em { font-style: italic; color: #888; }
-        .full-output-text tr:nth-child(even) { background: #16161e; }
+        .full-output-text tr:nth-child(even) { background: #f5f5f7; }
+        .full-output-text th { background: #eaeaeb; color: #000; }
+        .full-output-text td { color: #1d1d1f; }
+        
         .full-output-text blockquote {
             border-left: 3px solid var(--accent);
             margin: 12px 0;
             padding: 12px 16px;
-            background: #1a1e29;
-            color: #8899aa;
+            background: #f5f5f7;
+            color: #444;
             border-radius: 4px;
         }
-        .full-output-text ul {
-            margin: 8px 0;
-            padding-left: 24px;
-        }
-        .full-output-text li {
-            margin: 4px 0;
-            color: #cccccc;
-            line-height: 1.5;
-        }
-        .full-output-text hr {
+        .full-output-text ul { margin: 8px 0; padding-left: 24px; }
+        .full-output-text li { margin: 4px 0; color: #333; line-height: 1.5; }
+        .full-output-text hr { border-top: 1px solid #ddd; margin: 20px 0; }
+
+        .full-output-text pre { 
+            background: #0d0d12; 
+            color: #ff9f43;
+            padding: 16px; 
+            border-radius: 8px; 
+            overflow-x: auto;
+            margin: 16px 0;
+            font-family: "SF Mono", "Consolas", "Monaco", monospace; 
+            font-size: 13px;
+            line-height: 1.7;
             border: none;
+            position: relative;
+            display: block;
+        }
+        .full-output-text pre code {
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: #ff9f43;
+            display: block;
+        }
             border-top: 1px solid var(--border);
             margin: 20px 0;
         }
@@ -874,19 +910,19 @@
                     <div class="metrics-grid">
                         <div class="metric-card" title="CPU Usage: Percentage of processor utilization. 0-50% is normal, 50-80% is elevated, 80-100% is high.">
                             <div class="metric-value" id="metricCPU">-</div>
-                            <div class="metric-label">CPU</div>
+                            <div class="metric-label">CPU %</div>
                         </div>
                         <div class="metric-card" title="Memory Usage: Percentage of RAM being used. 0-60% is normal, 60-80% is elevated, 80-100% is high.">
                             <div class="metric-value" id="metricMemory">-</div>
-                            <div class="metric-label">Memory</div>
+                            <div class="metric-label">Memory %</div>
                         </div>
                         <div class="metric-card" title="Disk Usage: Percentage of disk space used. 0-70% is normal, 70-85% is elevated, 85-100% is critical.">
                             <div class="metric-value" id="metricDisk">-</div>
-                            <div class="metric-label">Disk</div>
+                            <div class="metric-label">Disk %</div>
                         </div>
                         <div class="metric-card" title="Network: Number of active network connections (listening + established). Higher counts indicate more network activity.">
                             <div class="metric-value" id="metricNet">-</div>
-                            <div class="metric-label">Network</div>
+                            <div class="metric-label">Connections</div>
                         </div>
                     </div>
                 </div>

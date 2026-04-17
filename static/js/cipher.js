@@ -684,12 +684,12 @@ class CipherDashboard {
                 <tr>
                     <td colspan="4" style="padding: 20px;">
                         <div style="margin-bottom: 16px;">
-                            <strong style="font-size: 14px; color: #ffffff;">Detection Engineering</strong>
+                            <strong style="font-size: 14px; color: #000;">Detection Engineering</strong>
                         </div>
-                        ${mitres.length > 0 ? `<div style="margin-bottom: 12px;"><span style="color: #888; font-size: 11px;">Techniques to Monitor:</span><br>${mitres.slice(0, 6).map(m => `<span class="mitre-badge" style="margin: 2px;">${m}</span>`).join(' ')}</div>` : ''}
-                        ${detectionRules.length > 0 ? `<div style="margin-bottom: 8px;"><span style="color: #888; font-size: 11px;">Detection Rules Generated:</span> ${detectionRules.length}</div>` : ''}
-                        ${nextSteps.length > 0 ? `<div><span style="color: #888; font-size: 11px;">Recommended Actions:</span><ol style="margin: 8px 0 0 16px; font-size: 11px; color: #aaa;">${nextSteps.slice(0, 3).map(s => `<li style="color: #aaa;">${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 80))}</li>`).join('')}</ol></div>` : ''}
-                        <div style="color: #666; font-size: 11px; margin-top: 12px;">View complete detection rules and queries in the Agent Outputs tab.</div>
+                        ${mitres.length > 0 ? `<div style="margin-bottom: 12px;"><span style="color: #666; font-size: 11px;">Techniques to Monitor:</span><br>${mitres.slice(0, 6).map(m => `<span class="mitre-badge" style="margin: 2px;">${m}</span>`).join(' ')}</div>` : ''}
+                        ${detectionRules.length > 0 ? `<div style="margin-bottom: 8px;"><span style="color: #666; font-size: 11px;">Detection Rules Generated:</span> ${detectionRules.length}</div>` : ''}
+                        ${nextSteps.length > 0 ? `<div><span style="color: #666; font-size: 11px;">Recommended Actions:</span><ol style="margin: 8px 0 0 16px; font-size: 11px; color: #333;">${nextSteps.slice(0, 3).map(s => `<li style="color: #333;">${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 80))}</li>`).join('')}</ol></div>` : ''}
+                        <div style="color: #888; font-size: 11px; margin-top: 12px;">View complete detection rules and queries in the Agent Outputs tab.</div>
                     </td>
                 </tr>
             `;
