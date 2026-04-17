@@ -265,8 +265,11 @@
         .log-entry.info { border-left-color: var(--accent); }
         .log-entry.success { border-left-color: var(--success); }
         .log-entry.command { border-left-color: #f59e0b; }
-        .log-entry.exec { border-left-color: #10b981; background: rgba(16, 185, 129, 0.05); }
-        .log-entry.output { border-left-color: #6b7280; }
+        .log-entry.exec { border-left-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .log-entry.exec .log-message { color: #ffffff; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
+        
+        .log-entry.output { border-left-color: #6b7280; background: rgba(107, 114, 128, 0.1); }
+        .log-entry.output .log-message { color: #00ff88; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
 .log-entry.error { border-left-color: var(--error); background: rgba(239, 68, 68, 0.15); }
         
         .log-entry.error .log-message { color: #ff6b6b; font-weight: 500; }
