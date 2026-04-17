@@ -457,9 +457,9 @@ class CipherDashboard {
     }
 
     updateObservationsViz(output) {
-        const cpuMatch = output.match(/(?:CPU|cpu)[:\s]*(\d+\.?\d*)%/i);
-        const memMatch = output.match(/(?:Memory|memory|RAM)[:\s]*(\d+\.?\d*)%/i);
-        const diskMatch = output.match(/(?:Disk|disk)[:\s]*(\d+\.?\d*)%/i);
+        const cpuMatch = output.match(/\|\s*CPU\s*\|\s*(\d+)%?/i) || output.match(/(?:CPU|cpu)[:\s]*(\d+\.?\d*)%/i);
+        const memMatch = output.match(/\|\s*Memory\s*\|\s*(\d+)%?/i) || output.match(/(?:Memory|memory|RAM)[:\s]*(\d+\.?\d*)%/i);
+        const diskMatch = output.match(/\|\s*Disk\s*\|\s*(\d+)%?/i) || output.match(/(?:Disk|disk)[:\s]*(\d+\.?\d*)%/i);
 
         if (cpuMatch) {
             const val = cpuMatch[1];
@@ -481,27 +481,36 @@ class CipherDashboard {
         }
         
         const processTable = document.getElementById('processTable');
-        const lines = output.split('\n');
         const processRows = [];
+        const lines = output.split('\n');
+        let inProcessSection = false;
         
         for (const line of lines) {
-            const cleanLine = line.trim();
-            const memMatch = cleanLine.match(/(\d+\.?\d*)\s*(MB|GB)/i);
-            const pidMatch = cleanLine.match(/pid[:\s]*(\d+)/i);
+            if (line.match(/Key Processes|Top Process|Process.*Memory/i)) {
+                inProcessSection = true;
+                continue;
+            }
+            if (line.match(/Network|Security Observation|Risk/i) && inProcessSection) {
+                break;
+            }
             
-            if ((memMatch || pidMatch) && cleanLine.length > 5) {
-                let name = cleanLine.split(/\s+/)[0];
-                if (!name || name.length < 2) name = cleanLine.substring(0, 20).trim();
-                
-                const pid = pidMatch ? pidMatch[1] : 'N/A';
-                const mem = memMatch ? memMatch[1] + ' ' + memMatch[2] : 'N/A';
-                
-                if (name.length > 2) {
-                    processRows.push(`<tr>
-                        <td class="process-name" style="word-break: break-all; max-width: 150px;">${this.escapeHtml(name)}</td>
-                        <td class="process-pid">${this.escapeHtml(pid)}</td>
-                        <td class="process-memory">${this.escapeHtml(mem)}</td>
-                    </tr>`);
+            if (inProcessSection) {
+                const cleanLine = line.replace(/^[\|\-\s]+/, '').trim();
+                if (cleanLine && cleanLine.length > 3) {
+                    const parts = cleanLine.split(/\|/).map(p => p.trim()).filter(p => p);
+                    if (parts.length >= 2) {
+                        let name = parts[0].replace(/\*\*/g, '').trim();
+                        let mem = parts.find(p => p.match(/\d+\s*(MB|GB)/i)) || parts[parts.length - 1];
+                        let pid = parts.find(p => p.match(/^\d{3,5}$/)) || 'N/A';
+                        
+                        if (mem && !mem.match(/\d+\s*(MB|GB)/i)) mem = 'N/A';
+                        
+                        processRows.push(`<tr>
+                            <td class="process-name" style="word-break: break-all; max-width: 150px;">${this.escapeHtml(name)}</td>
+                            <td class="process-pid">${this.escapeHtml(String(pid))}</td>
+                            <td class="process-memory">${this.escapeHtml(mem)}</td>
+                        </tr>`);
+                    }
                 }
             }
             
@@ -518,45 +527,67 @@ class CipherDashboard {
         const threats = [];
         
         const lines = output.split('\n');
+        let currentRisk = null;
         
         for (const line of lines) {
             const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
             
-            if (cleanLine.match(/risk:|threat:|severity/i)) {
-                let severity = 'medium';
-                if (cleanLine.match(/HIGH|CRITICAL/i)) severity = 'high';
-                else if (cleanLine.match(/LOW/i)) severity = 'low';
-                
-                const colonIdx = cleanLine.indexOf(':');
-                if (colonIdx > 0 && colonIdx < cleanLine.length - 10) {
-                    const text = cleanLine.substring(colonIdx + 1).trim();
-                    const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
-                    
-                    if (text.length > 5) {
-                        threats.push({
-                            title: text,
-                            severity: severity,
-                            mitre: mitres.slice(0, 3)
-                        });
-                    }
+            if (cleanLine.match(/\*\*Risk:\*\*/i) || cleanLine.match(/^\*\*Risk:\*\*/i)) {
+                if (currentRisk && currentRisk.title) {
+                    threats.push(currentRisk);
                 }
+                const title = cleanLine.replace(/\*\*/g, '').replace(/Risk:/i, '').trim();
+                currentRisk = { title: title, severity: 'medium', evidence: '', mitre: [], action: '' };
+            }
+            
+            if (currentRisk) {
+                if (cleanLine.match(/\*\*Severity:\*\*/i)) {
+                    const sev = cleanLine.replace(/\*\*/g, '').replace(/Severity:/i, '').trim().toUpperCase();
+                    currentRisk.severity = sev.includes('HIGH') || sev.includes('CRIT') ? 'high' : sev.includes('LOW') ? 'low' : 'medium';
+                }
+                if (cleanLine.match(/\*\*Evidence:\*\*/i)) {
+                    currentRisk.evidence = cleanLine.replace(/\*\*/g, '').replace(/Evidence:/i, '').trim();
+                }
+                if (cleanLine.match(/\*\*MITRE/i)) {
+                    const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
+                    currentRisk.mitre = mitres;
+                }
+                if (cleanLine.match(/\*\*Recommended Action:\*\*/i)) {
+                    currentRisk.action = cleanLine.replace(/\*\*/g, '').replace(/Recommended Action:/i, '').trim();
+                }
+            }
+            
+            if (cleanLine.match(/Attack Surface| Hypotheses|Missing Visibility/i) && currentRisk) {
+                threats.push(currentRisk);
+                currentRisk = null;
             }
         }
         
+        if (currentRisk && currentRisk.title) {
+            threats.push(currentRisk);
+        }
+        
         if (threats.length === 0) {
-            const riskLines = lines.filter(l => 
-                l.match(/attack|malicious|suspicious|anomal/i)
-            );
-            riskLines.slice(0, 3).forEach(line => {
+            for (const line of lines) {
                 const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
-                if (cleanLine.length > 15) {
+                if (cleanLine.match(/HIGH|MEDIUM|LOW/i) && cleanLine.includes(':') && cleanLine.length > 10) {
+                    const sevMatch = cleanLine.match(/severity[:\s]*(\w+)/i);
+                    let severity = 'medium';
+                    if (sevMatch) {
+                        const sev = sevMatch[1].toUpperCase();
+                        severity = sev.includes('HIGH') || sev.includes('CRIT') ? 'high' : sev.includes('LOW') ? 'low' : 'medium';
+                    }
+                    const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
                     threats.push({
                         title: cleanLine,
-                        severity: 'medium',
-                        mitre: line.match(/T\d{4}[\.\d]*/g) || []
+                        severity: severity,
+                        evidence: '',
+                        mitre: mitres,
+                        action: ''
                     });
+                    if (threats.length >= 5) break;
                 }
-            });
+            }
         }
         
         if (threats.length > 0) {
@@ -565,6 +596,7 @@ class CipherDashboard {
                     <div class="attack-severity ${t.severity}"></div>
                     <div class="attack-content">
                         <div class="attack-title">${this.escapeHtml(t.title)}</div>
+                        ${t.evidence ? `<div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">${this.escapeHtml(t.evidence.substring(0, 100))}</div>` : ''}
                         ${t.mitre.length > 0 ? t.mitre.slice(0, 3).map(m => `<span class="attack-mitre">${m}</span>`).join(' ') : ''}
                     </div>
                 </div>
@@ -578,71 +610,102 @@ class CipherDashboard {
         const tbody = document.getElementById('scenarioTable');
         const lines = output.split('\n');
         
-        const mitrePhases = [
-            { phase: 'Initial Access', mitre: 'TA0001' },
-            { phase: 'Execution', mitre: 'TA0002' },
-            { phase: 'Persistence', mitre: 'TA0003' },
-            { phase: 'Privilege Escalation', mitre: 'TA0004' },
-            { phase: 'Defense Evasion', mitre: 'TA0005' },
-            { phase: 'C2 / Exfiltration', mitre: 'TA0011/TA0010' }
-        ];
-        
-        let foundThreats = [];
-        let foundMitres = [];
-        let foundConditions = [];
+        const phases = [];
+        let currentPhase = null;
+        let currentSection = '';
+        let threatName = '';
+        let threatSeverity = '';
+        let currentDetection = '';
         
         for (const line of lines) {
-            const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
+            const cleanLine = line.replace(/^[\s\-\*\>\#\|]+/, '').trim();
             
-            const mitreMatch = cleanLine.match(/T\d{4}[\.\d]*/g);
-            if (mitreMatch) {
-                foundMitres.push(...mitreMatch);
+            if (cleanLine.match(/\*\*Threat Name:\*\*/i)) {
+                threatName = cleanLine.replace(/\*\*/g, '').replace(/Threat Name:/i, '').trim();
             }
             
-            if (cleanLine.match(/severity.*high/i)) {
-                foundThreats.push({ severity: 'HIGH', text: cleanLine });
-            } else if (cleanLine.match(/severity.*medium/i)) {
-                foundThreats.push({ severity: 'MEDIUM', text: cleanLine });
+            if (cleanLine.match(/\*\*Severity:\*\*/i)) {
+                const sev = cleanLine.replace(/\*\*/g, '').replace(/Severity:/i, '').trim().toUpperCase();
+                threatSeverity = sev;
             }
             
-            if (cleanLine.match(/condition|threshold|monitor|detect|alert/i) && cleanLine.includes(':')) {
-                const parts = cleanLine.split(':');
-                if (parts.length > 1) {
-                    foundConditions.push(parts[1].trim());
+            if (cleanLine.match(/\|.*\|.*\|.*\|/)) {
+                const cells = cleanLine.split('|').map(c => c.trim()).filter(c => c && !c.match(/^-+$/));
+                if (cells.length >= 3) {
+                    const phaseMatch = cells.find(c => c.match(/TA\d{4}/));
+                    const tacticMatch = cells.find(c => c.match(/Initial|Execution|Persistence|Privilege|Defense|Command|Exfiltration|Impact/i));
+                    const techniqueMatch = cells.find(c => c.match(/T\d{4}/));
+                    const evidenceMatch = cells[cells.length - 1];
+                    
+                    if (phaseMatch || tacticMatch) {
+                        phases.push({
+                            phase: tacticMatch || 'Attack Phase',
+                            technique: techniqueMatch || cells[1] || '',
+                            evidence: evidenceMatch || '',
+                            detection: ''
+                        });
+                    }
+                }
+            }
+            
+            if (cleanLine.match(/\*\*What attacker does:\*\*/i)) {
+                currentSection = 'attacker';
+            }
+            if (cleanLine.match(/\*\*What we observe:\*\*/i)) {
+                currentSection = 'observe';
+                if (phases.length > 0) {
+                    phases[phases.length - 1].detection = cleanLine.replace(/\*\*/g, '').replace(/What we observe:/i, '').trim();
+                }
+            }
+            if (cleanLine.match(/\*\*How to detect:\*\*/i)) {
+                currentSection = 'detect';
+                if (phases.length > 0) {
+                    phases[phases.length - 1].detection = cleanLine.replace(/\*\*/g, '').replace(/How to detect:/i, '').trim();
                 }
             }
         }
         
-        const threatSummary = foundThreats.length > 0 
-            ? foundThreats.slice(0, 3).map(t => `${t.severity}: ${t.text}`).join('<br>')
-            : 'Review full analysis in Agent Outputs tab';
-        
-        const mitreSummary = foundMitres.length > 0 
-            ? foundMitres.slice(0, 5).map(m => `<span class="mitre-badge">${m}</span>`).join(' ')
-            : 'See Agent Outputs';
-        
-        const detectionSummary = foundConditions.length > 0
-            ? foundConditions.slice(0, 2).join('<br>')
-            : 'Review detection rules in Agent Outputs';
-        
-        tbody.innerHTML = `
-            <tr>
-                <td><span class="phase-badge">Threat Overview</span></td>
-                <td>${mitreSummary}</td>
-                <td>${foundThreats.length} risks identified</td>
-                <td>See Agent Outputs tab for detection rules</td>
-            </tr>
-            <tr>
-                <td><span class="phase-badge">Detection</span></td>
-                <td colspan="2">${detectionSummary}</td>
-                <td>See Agent Outputs tab</td>
-            </tr>
-            <tr>
-                <td colspan="4" style="text-align: center; color: var(--text-secondary); font-style: italic;">
-                    View complete MITRE ATT&CK analysis and detection rules in the "Agent Outputs" tab
-                </td>
-            </tr>
-        `;
+        if (phases.length > 0) {
+            tbody.innerHTML = phases.slice(0, 5).map(p => `
+                <tr>
+                    <td><span class="phase-badge">${this.escapeHtml(p.phase)}</span></td>
+                    <td>${p.technique ? `<span class="mitre-badge">${this.escapeHtml(p.technique)}</span>` : '-'}</td>
+                    <td style="font-size: 10px; max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(p.evidence || '-')}</td>
+                    <td style="font-size: 10px; max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(p.detection || '-')}</td>
+                </tr>
+            `).join('');
+        } else {
+            const mitres = [];
+            for (const line of lines) {
+                const matches = line.match(/T\d{4}[\.\d]*/g);
+                if (matches) mitres.push(...matches);
+            }
+            
+            const tactics = [];
+            for (const line of lines) {
+                const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
+                if (cleanLine.match(/Initial Access|Execution|Persistence|Privilege Escalation|Defense Evasion|Discovery|Lateral Movement|Collection|Command and Control|Exfiltration|Impact/i)) {
+                    const match = cleanLine.match(/(TA\d{4})?\s*(Initial Access|Execution|Persistence|Privilege Escalation|Defense Evasion|Discovery|Lateral Movement|Collection|Command and Control|Exfiltration|Impact)/i);
+                    if (match) {
+                        tactics.push(match[2]);
+                    }
+                }
+            }
+            
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="padding: 20px;">
+                        <div style="margin-bottom: 16px;">
+                            <strong style="font-size: 14px;">${this.escapeHtml(threatName || 'Threat Analysis')}</strong>
+                            ${threatSeverity ? `<span style="margin-left: 12px; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: ${threatSeverity.includes('HIGH') || threatSeverity.includes('CRIT') ? '#ff3b30' : threatSeverity.includes('LOW') ? '#34c759' : '#ff9500'}; color: white;">${threatSeverity}</span>` : ''}
+                        </div>
+                        ${tactics.length > 0 ? `<div style="margin-bottom: 8px;"><span style="color: var(--text-secondary); font-size: 11px;">MITRE Tactics:</span> ${tactics.slice(0, 4).map(t => `<span class="mitre-badge" style="margin-left: 4px;">${t}</span>`).join('')}</div>` : ''}
+                        ${mitres.length > 0 ? `<div style="margin-bottom: 8px;"><span style="color: var(--text-secondary); font-size: 11px;">Techniques:</span> ${mitres.slice(0, 5).map(m => `<span class="mitre-badge" style="margin-left: 4px;">${m}</span>`).join('')}</div>` : ''}
+                        <div style="color: var(--text-secondary); font-size: 11px; margin-top: 12px;">View complete attack chain and detection rules in the Agent Outputs tab.</div>
+                    </td>
+                </tr>
+            `;
+        }
     }
 
     handleComplete() {
