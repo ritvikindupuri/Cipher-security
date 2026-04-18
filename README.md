@@ -26,6 +26,7 @@ Every AI decision is visible. Watch your telemetry flow through each agent, see 
 
 **Professional PDF Reports:**
 Generate comprehensive security reports with one click. Include system snapshots, threat analysis, MITRE ATT&CK mappings, and recommended detection rules. Perfect for compliance documentation, incident response records, or sharing findings with your security team.
+*View a sample report here: [Sample Analysis Report](docs/analysis_report.md)*
 
 **Live Streaming Dashboard:**
 Watch analysis unfold in real-time. Telemetry collection appears command-by-command. AI agents share their thinking as they analyze. Visualizations update as patterns emerge. You don't wait for results - you watch them being created.
