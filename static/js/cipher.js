@@ -350,6 +350,7 @@ class CipherDashboard {
 
     handleAgentChunk(data) {
         const { agent, chunk, full_output } = data;
+        console.log('Agent chunk received:', agent, 'output length:', full_output ? full_output.length : 0);
         this.agentOutputs[agent] = full_output;
         
         const agentName = this.AGENT_NAMES[agent] || agent;
@@ -599,6 +600,8 @@ if (html) {
     }
 
     handleComplete() {
+        console.log('Analysis complete. Agent outputs:', Object.keys(this.agentOutputs).map(k => `${k}: ${this.agentOutputs[k]?.length || 0} chars`));
+        
         this.eventSource.close();
         this.setRunning(false);
         this.setStatus('complete', 'Complete');
@@ -610,9 +613,19 @@ if (html) {
         this.updateFullOutputDisplay();
         
         // Update visualizations with final complete outputs
-        if (this.agentOutputs.agent1) this.updateObservationsViz(this.agentOutputs.agent1);
-        if (this.agentOutputs.agent2) this.updateThreatsViz(this.agentOutputs.agent2);
-        if (this.agentOutputs.agent3) this.updateScenariosViz(this.agentOutputs.agent3);
+        console.log('Updating visualizations...');
+        if (this.agentOutputs.agent1) {
+            console.log('Updating observations with', this.agentOutputs.agent1.length, 'chars');
+            this.updateObservationsViz(this.agentOutputs.agent1);
+        }
+        if (this.agentOutputs.agent2) {
+            console.log('Updating threats with', this.agentOutputs.agent2.length, 'chars');
+            this.updateThreatsViz(this.agentOutputs.agent2);
+        }
+        if (this.agentOutputs.agent3) {
+            console.log('Updating scenarios with', this.agentOutputs.agent3.length, 'chars');
+            this.updateScenariosViz(this.agentOutputs.agent3);
+        }
         
         this.showToast('Analysis complete');
     }
