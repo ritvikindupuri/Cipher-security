@@ -39,7 +39,7 @@ Watch analysis unfold in real-time. Telemetry collection appears command-by-comm
 
 <figure>
   <p align="center">
-    <img src="docs/architecture.png" alt="System Architecture Diagram" width="850"/>
+    <img src="https://imgur.com/FGlDvBR" alt="System Architecture Diagram" width="850"/>
   </p>
   <figcaption><p align="center"><b>Figure 1:</b> System Architecture of Scry workflow</p></figcaption>
 </figure>
