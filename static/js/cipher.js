@@ -23,7 +23,7 @@ class CipherDashboard {
         this.AGENT_CLASSES = {
             'agent1': 'observations',
             'agent2': 'threats',
-            'agent3': 'scenarios'
+            'agent3': 'detection'
         };
 
         this.THINKING_MESSAGES = {
@@ -101,7 +101,7 @@ class CipherDashboard {
         const outputMap = {
             'observations': this.agentOutputs.agent1,
             'threats': this.agentOutputs.agent2,
-            'scenarios': this.agentOutputs.agent3
+            'detection': this.agentOutputs.agent3
         };
         
         const output = outputMap[this.currentFullOutputTab];
@@ -111,7 +111,7 @@ class CipherDashboard {
             outputEl.innerHTML = this.renderMarkdown(output);
         } else {
             outputEl.classList.add('loading');
-            const agentNames = { observations: 'Observations', threats: 'Threats', scenarios: 'Scenarios' };
+            const agentNames = { observations: 'Observations', threats: 'Threats', detection: 'Detection' };
             outputEl.textContent = 'Awaiting ' + agentNames[this.currentFullOutputTab] + ' output...';
         }
     }
@@ -302,10 +302,15 @@ class CipherDashboard {
         } else if (phase === 'agent3' && status === 'starting') {
             this.updateStep(3, 'complete');
             this.updateStep(4, 'active');
-            this.logSection('SCENARIO AGENT', 'scenarios');
-            this.log('info', 'System', 'Scenario Agent is starting MITRE ATT&CK scenario generation...');
+            this.logSection('DETECTION AGENT', 'detection');
+            this.log('info', 'System', 'Detection Agent is starting detection rule generation...');
         } else if (phase === 'complete') {
             this.updateStep(4, 'complete');
+            this.logHeader('ALL AGENTS COMPLETED', 'success');
+            this.log('success', 'System', '✓ Collection Agent - Telemetry gathered');
+            this.log('success', 'System', '✓ Observation Agent - System analyzed');
+            this.log('success', 'System', '✓ Threat Agent - Attack surface mapped');
+            this.log('success', 'System', '✓ Detection Agent - Detection rules generated');
         }
     }
 
@@ -432,7 +437,7 @@ class CipherDashboard {
         const agentClass = agent === 'System' ? 'system' : 
                           agent === 'Observations' ? 'observations' :
                           agent === 'Threats' ? 'threats' :
-                          agent === 'Scenarios' ? 'scenarios' : 'system';
+                          agent === 'Detection' ? 'detection' : 'system';
 
         let icon = '';
         let content = this.escapeHtml(message);
