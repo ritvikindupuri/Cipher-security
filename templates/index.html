@@ -249,281 +249,11 @@
         .log-header-block.system .header-text { color: #10b981; }
         .log-header-block.observations .header-text { color: var(--accent); }
         .log-header-block.threats .header-text { color: var(--purple); }
-        .log-header-block.scenarios .header-text { color: var(--orange); }
-        .log-header-block.success .header-text { color: var(--success); }
-        .log-header-block.error .header-text { color: var(--error); }
-
-.log-entry {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            background: rgba(0,0,0,0.3);
-            border-bottom: 1px solid #222;
-        }
-        .log-entry:hover {
-            background: rgba(0,0,0,0.4);
-        }
-
-        .log-label {
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #888;
-            margin-left: auto;
-        }
-
-        .log-message {
-            color: #e0e0e0;
-            flex: 1;
-            word-break: break-word;
-        }
-
-        .log-entry.error .log-message { color: #ff6b6b; font-weight: 500; }
-        
-        .log-entry.info { border-left-color: var(--accent); }
-        .log-entry.success { border-left-color: var(--success); }
-        .log-entry.command { border-left-color: #f59e0b; }
-        
-        .log-entry.exec { border-left-color: #10b981; background: rgba(16, 185, 129, 0.1); }
-        .log-entry.exec .log-message { color: #ffffff; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
-        
-        .log-entry.output { border-left-color: #00ccff; background: rgba(0, 204, 255, 0.1); }
-        .log-entry.output .log-message { color: #00ccff; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
-        
-        .log-entry.error { border-left-color: var(--error); background: rgba(239, 68, 68, 0.15); }
-        
-        .log-block {
-            margin: 12px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #222;
-        }
-
-        .log-block.observations { border-color: rgba(0, 113, 227, 0.3); }
-        .log-block.threats { border-color: rgba(88, 86, 214, 0.3); }
-        .log-block.scenarios { border-color: rgba(255, 149, 0, 0.3); }
-
-        .log-block .log-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            background: rgba(0,0,0,0.3);
-            border-bottom: 1px solid #222;
-        }
-
-        .log-label {
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #666;
-            margin-left: auto;
-        }
-
-        .thinking-indicator {
-            font-size: 10px;
-            color: var(--accent);
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.3; }
-        }
-
-        .log-content {
-            padding: 14px;
-        }
-
-        .prompt-content {
-            background: #1a1a2e;
-        }
-
-        .prompt-description {
-            font-size: 10px;
-            color: #666;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .prompt-text {
-            color: #ccc;
-            font-size: 11px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            max-height: 200px;
-            overflow-y: auto;
-            background: #16161e;
-            padding: 12px;
-            border-radius: 4px;
-            border: 1px solid #333;
-        }
-
-        .ai-response {
-            background: #0a1a14;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .response-text {
-            color: #10b981;
-            font-size: 12px;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .command-block {
-            margin-bottom: 24px;
-            border-left: 3px solid var(--border);
-            padding-left: 16px;
-        }
-
-        .command-block.system { border-color: var(--text-secondary); }
-        .command-block.observations { border-color: var(--accent); }
-        .command-block.threats { border-color: var(--purple); }
-        .command-block.scenarios { border-color: var(--orange); }
-
-        .agent-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .agent-badge.system { background: #333; color: #fff; }
-        .agent-badge.observations { background: var(--accent); color: #fff; }
-        .agent-badge.threats { background: var(--purple); color: #fff; }
-        .agent-badge.scenarios { background: var(--orange); color: #fff; }
-
-        .agent-badge svg { width: 14px; height: 14px; }
-
-        .command-text { color: #fff; margin: 4px 0; }
-        .command-text.exec { color: #10b981; }
-
-        .thinking {
-            background: #1a1a2e;
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 12px;
-            margin: 8px 0;
-        }
-
-        .thinking-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #888;
-            margin-bottom: 6px;
-        }
-
-        .thinking-text { color: #ccc; line-height: 1.6; }
-
-        .command-output {
-            color: #10b981;
-            background: #0a1a14;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 8px 0;
-            white-space: pre-wrap;
-            overflow-x: auto;
-        }
-
-        .command-error { color: var(--error); margin: 8px 0; }
-
-        .prompt-box {
-            background: #1a1a2e;
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 12px;
-            margin: 8px 0;
-        }
-
-        .prompt-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .prompt-content {
-            color: #888;
-            font-size: 11px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: "SF Mono", "Menlo", monospace;
-        }
-
-        .agent-output {
-            background: #0a1a14;
-            border: 1px solid #1a3a2a;
-            border-radius: 6px;
-            padding: 16px;
-            margin: 8px 0;
-            color: #10b981;
-            font-size: 12px;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: "SF Mono", "Menlo", monospace;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        /* Agent Panels */
-        .agent-panels {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 16px;
-            padding: 20px;
-            background: var(--bg-secondary);
-            overflow-y: auto;
-        }
-
-        .agent-card {
-            background: var(--bg);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .agent-card.full { grid-column: span 2; }
-
-        .agent-card-header {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .agent-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .agent-avatar svg { width: 20px; height: 20px; }
-        .agent-avatar.observations { background: rgba(0, 113, 227, 0.1); }
-        .agent-avatar.threats { background: rgba(88, 86, 214, 0.1); }
-        .agent-avatar.scenarios { background: rgba(255, 149, 0, 0.1); }
+.log-header-block.detection .header-text { color: var(--orange); }
+        .log-block.detection { border-color: rgba(255, 149, 0, 0.3); }
+        .command-block.detection { border-color: var(--orange); }
+        .agent-badge.detection { background: var(--orange); color: #fff; }
+        .agent-avatar.detection { background: rgba(255, 149, 0, 0.1); }
 
         .agent-name { font-weight: 600; font-size: 14px; }
         .agent-desc { font-size: 11px; color: var(--text-secondary); }
@@ -1062,15 +792,22 @@
                             </div>
                         </div>
 
-                        <!-- Scenarios -->
-                        <div class="agent-output-card full" id="card-scenarios">
+<!-- Detection -->
+                        <div class="agent-output-card full" id="card-detection">
                             <div class="agent-output-header">
-                                <div class="agent-avatar scenarios">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="#ff9500" stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
-                                    </svg>
+                                <div class="agent-avatar detection">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
                                 </div>
+                                <div class="agent-output-title">Detection Engineering</div>
+                                <div class="agent-output-subtitle">Detection Rules & Hunting Queries</div>
+                            </div>
+                            <div class="agent-output-content" id="output-detection">
+                                <div class="agent-loading">
+                                    <div class="spinner"></div>
+                                    <span>Waiting for Detection Engineering analysis...</span>
+                                </div>
+                            </div>
+                        </div>
                                 <div>
                                     <div class="agent-output-title">Detection Engineering</div>
                                     <div class="agent-output-subtitle">Detection Rules & Hunting Queries</div>
@@ -1099,7 +836,7 @@
                         <div class="full-outputs-tabs">
                             <button class="full-output-tab active" data-output="observations">Observations</button>
                             <button class="full-output-tab" data-output="threats">Threats</button>
-                            <button class="full-output-tab" data-output="scenarios">Scenarios</button>
+                            <button class="full-output-tab" data-output="detection">Detection</button>
                         </div>
                         <div class="full-output-content" id="fullOutputContent">
                             <pre class="full-output-text" id="fullOutputText">Select an agent to view its complete output...</pre>
