@@ -12,22 +12,22 @@ Threats are automatically mapped to the MITRE ATT&CK framework, so you see not j
 
 ## Key Features
 
-**Real-Time System Telemetry**
+**Real-Time System Telemetry:**
 Scry continuously monitors your Windows machine, collecting CPU usage, memory allocation, disk utilization, network connections, and running processes. Every data point is traceable to its source system call, giving you confidence that what you see is what's actually happening.
 
-**AI-Powered Threat Analysis**
+**AI-Powered Threat Analysis:**
 Three specialized agents work together to analyze your telemetry. The Observation Agent extracts factual findings from raw data. The Threat Agent maps attack surface and potential risks. The Detection Engineering Agent generates actionable detection rules and hunting queries. Each agent builds on the previous one, creating a complete picture from raw numbers.
 
-**MITRE ATT&CK Framework Integration**
+**MITRE ATT&CK Framework Integration:**
 Threats don't exist in a vacuum - Scry automatically maps detected patterns to the industry-standard MITRE ATT&CK framework. You see not just what might be wrong, but how it fits into known attack patterns, from initial access through data exfiltration.
 
-**Transparent Analysis Pipeline**
+**Transparent Analysis Pipeline:**
 Every AI decision is visible. Watch your telemetry flow through each agent, see the exact prompts sent to the AI, observe the reasoning as it happens. When Scry flags a concern, you can trace exactly why - back to the specific metric, the specific pattern, the specific technique that triggered it.
 
-**Professional PDF Reports**
+**Professional PDF Reports:**
 Generate comprehensive security reports with one click. Include system snapshots, threat analysis, MITRE ATT&CK mappings, and recommended detection rules. Perfect for compliance documentation, incident response records, or sharing findings with your security team.
 
-**Live Streaming Dashboard**
+**Live Streaming Dashboard:**
 Watch analysis unfold in real-time. Telemetry collection appears command-by-command. AI agents share their thinking as they analyze. Visualizations update as patterns emerge. You don't wait for results - you watch them being created.
 
 ---
