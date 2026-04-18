@@ -618,13 +618,18 @@ if (html) {
                     threats.push(currentRisk);
                 }
                 const title = cleanLine.replace(/\*\*/g, '').replace(/Risk:/i, '').trim();
-                currentRisk = { title: title, severity: 'medium', evidence: '', mitre: [], action: '' };
+                currentRisk = { title: title, severity: 'medium', severityReason: '', evidence: '', mitre: [], action: '' };
             }
             
             if (currentRisk) {
                 if (cleanLine.match(/\*\*Severity:\*\*/i)) {
                     const sev = cleanLine.replace(/\*\*/g, '').replace(/Severity:/i, '').trim().toUpperCase();
                     currentRisk.severity = sev.includes('HIGH') || sev.includes('CRIT') ? 'high' : sev.includes('LOW') ? 'low' : 'medium';
+                    if (sev.includes('CRIT')) currentRisk.severityReason = 'Critical severity explicitly stated by analyst';
+                    else if (sev.includes('HIGH')) currentRisk.severityReason = 'High severity based on exposed attack surface or critical asset';
+                    else if (sev.includes('MEDIUM') || sev.includes('MED')) currentRisk.severityReason = 'Medium severity - moderate exposure, limited visibility, or partial control';
+                    else if (sev.includes('LOW')) currentRisk.severityReason = 'Low severity - minimal exposure, good visibility, or strong controls present';
+                    else currentRisk.severityReason = 'Default severity - no explicit rating provided';
                 }
                 if (cleanLine.match(/\*\*Evidence:\*\*/i)) {
                     currentRisk.evidence = cleanLine.replace(/\*\*/g, '').replace(/Evidence:/i, '').trim();
@@ -654,14 +659,20 @@ if (html) {
                 if (cleanLine.match(/HIGH|MEDIUM|LOW/i) && cleanLine.includes(':') && cleanLine.length > 10) {
                     const sevMatch = cleanLine.match(/severity[:\s]*(\w+)/i);
                     let severity = 'medium';
+                    let severityReason = 'No explicit severity rating provided in output';
                     if (sevMatch) {
                         const sev = sevMatch[1].toUpperCase();
                         severity = sev.includes('HIGH') || sev.includes('CRIT') ? 'high' : sev.includes('LOW') ? 'low' : 'medium';
+                        if (sev.includes('CRIT')) severityReason = 'Critical severity explicitly stated';
+                        else if (sev.includes('HIGH')) severityReason = 'High severity based on analyst assessment';
+                        else if (sev.includes('MED') || sev.includes('MEDIUM')) severityReason = 'Medium severity - moderate exposure level';
+                        else if (sev.includes('LOW')) severityReason = 'Low severity - minimal exposure level';
                     }
                     const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
                     threats.push({
                         title: cleanLine,
                         severity: severity,
+                        severityReason: severityReason,
                         evidence: '',
                         mitre: mitres,
                         action: ''
@@ -671,19 +682,44 @@ if (html) {
             }
         }
         
+        const getSeverityTooltip = (t) => {
+            let factors = '';
+            let why = t.severityReason || 'No explicit reason provided';
+            if (t.severity === 'high') {
+                factors = 'Exposed network services/ports | Critical system components | Known vulnerable software | Unusual process activity | External network exposure';
+            } else if (t.severity === 'medium') {
+                factors = 'Partial attack surface exposure | Some visibility gaps | Moderate network access | Limited abnormal behavior';
+            } else {
+                factors = 'Minimal exposure | Good visibility | Strong controls present | Normal system behavior';
+            }
+            return { rating: t.severity.toUpperCase(), why: why, factors: factors };
+        };
+        
+        const getEvidenceTooltip = (t) => {
+            if (!t.evidence) return null;
+            return t.evidence;
+        };
+        
         if (threats.length > 0) {
-            threatList.innerHTML = threats.slice(0, 8).map(t => `
-                <div style="padding: 12px; margin-bottom: 8px; border-radius: 6px; background: ${t.severity === 'high' ? '#ffe6e6' : t.severity === 'medium' ? '#fff3e6' : '#e6f4ea'}; border: 1px solid ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};">
+            threatList.innerHTML = threats.slice(0, 8).map(t => {
+                const severityInfo = getSeverityTooltip(t);
+                const evidenceInfo = getEvidenceTooltip(t);
+                return `
+                <div class="threat-card" style="padding: 12px; margin-bottom: 8px; border-radius: 6px; background: ${t.severity === 'high' ? '#ffe6e6' : t.severity === 'medium' ? '#fff3e6' : '#e6f4ea'}; border: 1px solid ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
                         <div style="width: 10px; height: 10px; border-radius: 50%; background: ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};"></div>
-                        <span style="font-size: 10px; font-weight: 600; color: ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};">${t.severity.toUpperCase()}</span>
+                        <span class="severity-badge" style="font-size: 10px; font-weight: 600; color: ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'}; cursor: pointer;"
+                              onmouseover="showTooltip(this, '${severityInfo.rating}', '${severityInfo.why.replace(/'/g, "\\'")}', '${severityInfo.factors.replace(/'/g, "\\'")}')"
+                              onmouseout="hideTooltip()">${t.severity.toUpperCase()} SEVERITY</span>
                     </div>
-                    <div style="font-weight: 600; font-size: 13px; color: #1d1d1f; margin-bottom: 4px;">${this.escapeHtml(t.title)}</div>
-                    ${t.evidence ? `<div style="font-size: 11px; color: #666; margin-bottom: 4px;"><strong>Evidence:</strong> ${this.escapeHtml(t.evidence.substring(0, 200))}</div>` : ''}
+                    <div style="font-weight: 600; font-size: 13px; color: #1d1d1f; margin-bottom: 6px;">${this.escapeHtml(t.title)}</div>
+                    ${t.evidence ? `<div class="evidence-text" style="font-size: 11px; color: #666; margin-bottom: 4px; cursor: pointer;"
+                        onmouseover="showEvidenceTooltip(this, '${t.evidence.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')"
+                        onmouseout="hideTooltip()"><strong>Evidence:</strong> ${this.escapeHtml(t.evidence.substring(0, 200))}</div>` : ''}
                     ${t.action ? `<div style="font-size: 11px; color: #0071e3; margin-bottom: 4px;"><strong>Action:</strong> ${this.escapeHtml(t.action.substring(0, 150))}</div>` : ''}
                     ${t.mitre.length > 0 ? '<div style="margin-top: 6px;">' + t.mitre.slice(0, 4).map(m => `<span style="margin-right: 4px; font-size: 10px; padding: 2px 6px; background: #eaeaeb; border-radius: 4px;">${m}</span>`).join('') + '</div>' : ''}
                 </div>
-            `).join('');
+            `}).join('');
         } else {
             threatList.innerHTML = '<div style="color: #666; font-size: 12px; padding: 12px;">No significant risks detected. View full analysis in Agent Outputs tab.</div>';
         }
@@ -888,8 +924,27 @@ if (html) {
     }
 
     download() {
-        window.location.href = '/api/download/pdf';
-        this.showToast('Downloading report...');
+        fetch('/api/download/pdf')
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || 'Download failed'); });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Scry_report_${new Date().toISOString().slice(0,19).replace(/[-T:]/g,'_')}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                this.showToast('Report downloaded successfully');
+            })
+            .catch(err => {
+                this.showToast(err.message, 'error');
+            });
     }
 
     showToast(message, type = 'info') {
@@ -918,5 +973,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.remove('copied');
             }, 2000);
         });
+    };
+    
+    window.showTooltip = function(elem, rating, why, factors) {
+        let existing = document.getElementById('customTooltip');
+        if (existing) existing.remove();
+        
+        const tooltip = document.createElement('div');
+        tooltip.id = 'customTooltip';
+        tooltip.style.cssText = 'position: fixed; z-index: 9999; background: #1d1d1f; color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 12px; max-width: 320px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); border: 1px solid #333; pointer-events: none;';
+        tooltip.innerHTML = `
+            <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px; color: ${rating === 'HIGH' ? '#ff3b30' : rating === 'MEDIUM' ? '#ff9500' : '#34c759'};">SEVERITY: ${rating}</div>
+            <div style="margin-bottom: 10px; line-height: 1.5;"><strong>Why:</strong> ${why}</div>
+            <div style="line-height: 1.6;"><strong>Factors considered:</strong><br/>${factors.replace(/\|/g, '<br/>')}</div>
+        `;
+        
+        const rect = elem.getBoundingClientRect();
+        tooltip.style.left = rect.left + 'px';
+        tooltip.style.top = (rect.bottom + 8) + 'px';
+        
+        document.body.appendChild(tooltip);
+    };
+    
+    window.hideTooltip = function() {
+        const existing = document.getElementById('customTooltip');
+        if (existing) existing.remove();
+    };
+    
+    window.showEvidenceTooltip = function(elem, evidence) {
+        let existing = document.getElementById('customTooltip');
+        if (existing) existing.remove();
+        
+        const tooltip = document.createElement('div');
+        tooltip.id = 'customTooltip';
+        tooltip.style.cssText = 'position: fixed; z-index: 9999; background: #1d1d1f; color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 12px; max-width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); border: 1px solid #333; pointer-events: none;';
+        tooltip.innerHTML = `
+            <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #00ccff;">EVIDENCE FROM TELEMETRY</div>
+            <div style="line-height: 1.5; color: #ddd;">${evidence.replace(/\n/g, '<br/>')}</div>
+            <div style="margin-top: 8px; font-size: 10px; color: #888;">Source: System telemetry collection</div>
+        `;
+        
+        const rect = elem.getBoundingClientRect();
+        tooltip.style.left = rect.left + 'px';
+        tooltip.style.top = (rect.bottom + 8) + 'px';
+        
+        document.body.appendChild(tooltip);
     };
 });

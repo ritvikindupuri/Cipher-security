@@ -11,24 +11,8 @@ _PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 
 
 def _get_client():
-    use_deepseek = os.environ.get("USE_DEEPSEEK", "").lower() in ("1", "true", "yes")
-    use_openrouter = os.environ.get("USE_OPENROUTER", "").lower() in ("1", "true", "yes")
-    
-    if use_deepseek:
-        from openai import OpenAI
-        return OpenAI(
-            api_key=os.environ.get("DEEPSEEK_API_KEY"),
-            base_url="https://api.deepseek.com",
-        ), "deepseek"
-    elif use_openrouter:
-        from openai import OpenAI
-        return OpenAI(
-            api_key=os.environ.get("OPENROUTER_API_KEY"),
-            base_url=os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
-        ), "openrouter"
-    else:
-        from anthropic import Anthropic
-        return Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY")), "anthropic"
+    from anthropic import Anthropic
+    return Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY")), "anthropic"
 
 
 def _load_prompt(name: str) -> str:
@@ -43,42 +27,25 @@ def _text_from_anthropic(msg: Any) -> str:
     return "\n".join(parts).strip()
 
 
-def _text_from_openai(msg: Any) -> str:
-    return msg.choices[0].message.content.strip()
-
-
 def _call_blocking(
     client: Any,
-    provider: str,
     *,
     model: str,
     system: str,
     user_text: str,
     max_tokens: int = 4096,
 ) -> str:
-    if provider == "anthropic":
-        msg = client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            system=system,
-            messages=[{"role": "user", "content": user_text}],
-        )
-        return _text_from_anthropic(msg)
-    else:
-        msg = client.chat.completions.create(
-            model=model,
-            max_tokens=max_tokens,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_text},
-            ],
-        )
-        return _text_from_openai(msg)
+    msg = client.messages.create(
+        model=model,
+        max_tokens=max_tokens,
+        system=system,
+        messages=[{"role": "user", "content": user_text}],
+    )
+    return _text_from_anthropic(msg)
 
 
 def _call_streaming(
     client: Any,
-    provider: str,
     *,
     model: str,
     system: str,
@@ -98,37 +65,18 @@ def _call_streaming(
         except (UnicodeEncodeError, AttributeError):
             pass
     
-    if provider == "anthropic":
-        with client.messages.stream(
-            model=model,
-            max_tokens=max_tokens,
-            system=system,
-            messages=[{"role": "user", "content": user_text}],
-            timeout=timeout,
-        ) as stream:
-            for text in stream.text_stream:
-                chunks.append(text)
-                _safe_write(text)
-                if callback:
-                    callback(text)
-    else:
-        stream = client.chat.completions.create(
-            model=model,
-            max_tokens=max_tokens,
-            stream=True,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_text},
-            ],
-            timeout=timeout,
-        )
-        for chunk in stream:
-            if chunk.choices and chunk.choices[0].delta.content:
-                text = chunk.choices[0].delta.content
-                chunks.append(text)
-                _safe_write(text)
-                if callback:
-                    callback(text)
+    with client.messages.stream(
+        model=model,
+        max_tokens=max_tokens,
+        system=system,
+        messages=[{"role": "user", "content": user_text}],
+        timeout=timeout,
+    ) as stream:
+        for text in stream.text_stream:
+            chunks.append(text)
+            _safe_write(text)
+            if callback:
+                callback(text)
     return "".join(chunks).strip()
 
 
@@ -149,40 +97,15 @@ def run_claude_chain(
     err: TextIO | None = None,
     on_agent_chunk: Callable[[str, str], None] | None = None,
 ) -> ChainResult:
-    """
-    Run three agents in order. If stream=True, each agent's reply is written to `out` as tokens arrive.
-    Supports both Anthropic and OpenRouter providers.
-    
-    Args:
-        on_agent_chunk: Optional callback(agent_id, chunk) called for each streaming chunk
-    """
     out = out or sys.stdout
     err = err or sys.stderr
 
-    use_deepseek = os.environ.get("USE_DEEPSEEK", "").lower() in ("1", "true", "yes")
-    use_openrouter = os.environ.get("USE_OPENROUTER", "").lower() in ("1", "true", "yes")
-    
-    if use_deepseek:
-        api_key = os.environ.get("DEEPSEEK_API_KEY")
-        if not api_key:
-            raise RuntimeError(
-                "DEEPSEEK_API_KEY is not set. Set USE_DEEPSEEK=1 and add your key to .env"
-            )
-        model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
-    elif use_openrouter:
-        api_key = os.environ.get("OPENROUTER_API_KEY")
-        if not api_key:
-            raise RuntimeError(
-                "OPENROUTER_API_KEY is not set. Set USE_OPENROUTER=1 and add your key to .env"
-            )
-        model = os.environ.get("OPENROUTER_MODEL", "deepseek/deepseek-chat-v3")
-    else:
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
-        if not api_key:
-            raise RuntimeError(
-                "ANTHROPIC_API_KEY is not set. Set USE_DEEPSEEK=1, USE_OPENROUTER=1, or ANTHROPIC_API_KEY in .env"
-            )
-        model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "ANTHROPIC_API_KEY is not set. Add your key to .env"
+        )
+    model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
 
     telemetry_json = json.dumps(snapshot, indent=2, default=str)
 
@@ -218,11 +141,11 @@ def run_claude_chain(
                     on_agent_chunk(agent_id, chunk)
             
             return _call_streaming(
-                client, provider, model=model, system=system, user_text=user_text, 
+                client, model=model, system=system, user_text=user_text, 
                 out=out, callback=callback, timeout=120
             )
         text = _call_blocking(
-            client, provider, model=model, system=system, user_text=user_text
+            client, model=model, system=system, user_text=user_text
         )
         _safe_write(text + "\n", out)
         out.flush()
