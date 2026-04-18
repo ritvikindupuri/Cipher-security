@@ -608,6 +608,12 @@ if (html) {
         this.log('success', 'System', 'Security analysis finished. Review agent outputs and visualizations.');
         
         this.updateFullOutputDisplay();
+        
+        // Update visualizations with final complete outputs
+        if (this.agentOutputs.agent1) this.updateObservationsViz(this.agentOutputs.agent1);
+        if (this.agentOutputs.agent2) this.updateThreatsViz(this.agentOutputs.agent2);
+        if (this.agentOutputs.agent3) this.updateScenariosViz(this.agentOutputs.agent3);
+        
         this.showToast('Analysis complete');
     }
 
