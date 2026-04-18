@@ -617,13 +617,14 @@ class CipherDashboard {
                     <div class="attack-severity ${t.severity}"></div>
                     <div class="attack-content">
                         <div class="attack-title">${this.escapeHtml(t.title)}</div>
-                        ${t.evidence ? `<div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">${this.escapeHtml(t.evidence.substring(0, 100))}</div>` : ''}
-                        ${t.mitre.length > 0 ? t.mitre.slice(0, 3).map(m => `<span class="attack-mitre">${m}</span>`).join(' ') : ''}
+                        ${t.evidence ? `<div style="font-size: 11px; color: #666; margin-top: 4px;">${this.escapeHtml(t.evidence.substring(0, 150))}</div>` : ''}
+                        ${t.action ? `<div style="font-size: 10px; color: #0071e3; margin-top: 4px;">Action: ${this.escapeHtml(t.action.substring(0, 100))}</div>` : ''}
+                        ${t.mitre.length > 0 ? '<div style="margin-top: 6px;">' + t.mitre.slice(0, 3).map(m => `<span class="attack-mitre">${m}</span>`).join(' ') + '</div>' : ''}
                     </div>
                 </div>
             `).join('');
         } else {
-            threatList.innerHTML = '<div style="color: var(--text-secondary); font-size: 12px;">No significant risks detected. View full analysis in Agent Outputs tab.</div>';
+            threatList.innerHTML = '<div style="color: #666; font-size: 12px;">No significant risks detected. View full analysis in Agent Outputs tab.</div>';
         }
     }
 
@@ -683,10 +684,12 @@ class CipherDashboard {
         if (priorities.length > 0) {
             tbody.innerHTML = priorities.slice(0, 5).map(p => `
                 <tr>
-                    <td><span class="phase-badge" style="background: ${p.priority === '1' ? '#ff3b30' : p.priority === '2' ? '#ff9500' : '#34c759'};">P${p.priority}</span></td>
-                    <td>${p.technique ? `<span class="mitre-badge">${this.escapeHtml(p.technique)}</span>` : '-'}</td>
-                    <td>${p.reason ? this.escapeHtml(p.reason.substring(0, 60)) : '-'}</td>
-                    <td style="font-size: 10px;">${detectionRules.length} rules</td>
+                    <td style="font-weight: 600;">Priority ${p.priority}</td>
+                    <td>
+                        <div style="font-weight: 600;">${p.technique || '-'}</div>
+                        <div style="font-size: 11px; color: #666;">${p.tactic || ''}</div>
+                        <div style="font-size: 11px; color: #444; margin-top: 4px;">${p.reason ? p.reason.substring(0, 100) : ''}</div>
+                    </td>
                 </tr>
             `).join('');
         } else if (mitres.length > 0 || detectionRules.length > 0 || nextSteps.length > 0) {
@@ -694,24 +697,32 @@ class CipherDashboard {
             
             if (mitres.length > 0) {
                 rows += `<tr>
-                    <td style="font-weight: 600;">MITRE Techniques</td>
-                    <td colspan="3">${mitres.slice(0, 8).map(m => `<span class="mitre-badge">${m}</span>`).join(' ')}</td>
+                    <td style="font-weight: 600; background: #f5f5f7;">MITRE ATT&CK Techniques</td>
+                    <td style="background: #f5f5f7;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                            ${mitres.slice(0, 10).map(m => `<span class="mitre-badge">${m}</span>`).join(' ')}
+                        </div>
+                    </td>
                 </tr>`;
             }
             
             if (detectionRules.length > 0) {
                 rows += `<tr>
                     <td style="font-weight: 600;">Detection Rules</td>
-                    <td colspan="3">${detectionRules.length} rules generated</td>
+                    <td>
+                        <strong>${detectionRules.length}</strong> rules available. 
+                        View complete rules in Agent Outputs tab.
+                        ${detectionRules.slice(0, 2).map(r => `<div style="font-size: 11px; color: #666; margin-top: 4px;">• ${this.escapeHtml(r.name || 'Rule')}</div>`).join('')}
+                    </td>
                 </tr>`;
             }
             
             if (nextSteps.length > 0) {
                 rows += `<tr>
-                    <td style="font-weight: 600; vertical-align: top;">Recommended Actions</td>
-                    <td colspan="3">
-                        <ol style="margin: 0; padding-left: 18px; font-size: 12px;">
-                            ${nextSteps.slice(0, 3).map(s => `<li style="margin: 4px 0;">${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 100))}</li>`).join('')}
+                    <td style="font-weight: 600;">Recommended Actions</td>
+                    <td>
+                        <ol style="margin: 0; padding-left: 18px; font-size: 12px; color: #1d1d1f;">
+                            ${nextSteps.slice(0, 5).map(s => `<li style="margin: 6px 0;">${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 150))}</li>`).join('')}
                         </ol>
                     </td>
                 </tr>`;
@@ -720,10 +731,10 @@ class CipherDashboard {
             if (rows) {
                 tbody.innerHTML = rows;
             } else {
-                tbody.innerHTML = `<tr><td colspan="4" style="padding: 20px; text-align: center; color: #666;">View complete detection rules in Agent Outputs tab</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="2" style="padding: 20px; text-align: center; color: #666;">View complete detection rules in Agent Outputs tab</td></tr>`;
             }
         } else {
-            tbody.innerHTML = `<tr><td colspan="4" style="padding: 20px; text-align: center; color: #666;">Awaiting detection analysis...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="2" style="padding: 20px; text-align: center; color: #666;">Awaiting detection analysis...</td></tr>`;
         }
     }
 
@@ -802,9 +813,9 @@ class CipherDashboard {
         document.getElementById('chartDiskVal').textContent = '0%';
         document.getElementById('chartNetVal').textContent = '0%';
 
-        document.getElementById('processTable').innerHTML = '<tr><td colspan="3" style="color: var(--text-secondary)">Awaiting telemetry data...</td></tr>';
-        document.getElementById('threatList').innerHTML = '<div style="color: var(--text-secondary); font-size: 12px;">Awaiting threat analysis...</div>';
-        document.getElementById('scenarioTable').innerHTML = '<tr><td colspan="4" style="color: var(--text-secondary)">Awaiting scenario generation...</td></tr>';
+        document.getElementById('processTable').innerHTML = '<tr><td colspan="3" style="color: #666">Awaiting telemetry data...</td></tr>';
+        document.getElementById('threatList').innerHTML = '<div style="color: #666; font-size: 12px;">Awaiting threat analysis...</div>';
+        document.getElementById('scenarioTable').innerHTML = '<tr><td colspan="2" style="color: #666;">Awaiting scenario generation...</td></tr>';
 
         this.downloadBtn.disabled = true;
         this.agentOutputs = { agent1: '', agent2: '', agent3: '' };
