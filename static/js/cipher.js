@@ -857,9 +857,6 @@ if (html) {
             }
             
             if (uniqueMitres.length > 0) {
-            let rows = '';
-            
-            if (uniqueMitres.length > 0) {
                 rows += `<tr style="border-bottom: 1px solid #ddd;">
                     <td style="padding: 12px; font-weight: 600; background: #f5f5f7; color: #1d1d1f;">MITRE ATT&CK Techniques</td>
                     <td style="padding: 12px; background: #f5f5f7;">
