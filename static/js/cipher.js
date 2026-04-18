@@ -121,8 +121,7 @@ class CipherDashboard {
         
         let html = this.escapeHtml(text);
         
-        const tableRows = [];
-        const separatorIndices = [];
+        const tableMatches = [];
         const lines = html.split('\n');
         
         for (let i = 0; i < lines.length; i++) {
@@ -130,32 +129,71 @@ class CipherDashboard {
             const rowMatch = line.match(/^\s*\|(.+)\|\s*$/);
             if (rowMatch) {
                 const cells = rowMatch[1].split('|').map(c => c.trim());
-                if (cells.every(c => /^-+$/.test(c))) {
-                    separatorIndices.push(tableRows.length);
-                } else {
-                    tableRows.push(cells);
+                if (cells.length > 1) {
+                    tableMatches.push({
+                        lineIndex: i,
+                        cells: cells,
+                        isSeparator: cells.every(c => /^-+$/.test(c))
+                    });
                 }
             }
         }
         
-        if (tableRows.length > 0) {
-            let tableHtml = '<table class="rendered-table"><thead>';
-            if (separatorIndices.length > 0) {
-                tableHtml += '<tr>' + tableRows[0].map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
-                for (let i = separatorIndices[0] + 1; i < tableRows.length; i++) {
-                    tableHtml += '<tr>' + tableRows[i].map(c => `<td>${c}</td>`).join('') + '</tr>';
-                }
-            } else {
-                tableHtml += '<tr>' + tableRows[0].map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
-                for (let i = 1; i < tableRows.length; i++) {
-                    tableHtml += '<tr>' + tableRows[i].map(c => `<td>${c}</td>`).join('') + '</tr>';
-                }
-            }
-            tableHtml += '</tbody></table>';
+        if (tableMatches.length > 0) {
+            const processedTables = [];
+            let lastEnd = 0;
+            let i = 0;
             
-            html = html.replace(/^\s*\|.+\|\s*$/gm, '').replace(/^\s*\|[-:\s|]+\|\s*$/gm, '');
-            html = html.replace(/<\/table>\s*<table>/g, '');
-            html += '\n' + tableHtml;
+            while (i < tableMatches.length) {
+                if (tableMatches[i].isSeparator) {
+                    i++;
+                    continue;
+                }
+                
+                const headerRow = tableMatches[i];
+                const tableRows = [headerRow.cells];
+                const startIdx = headerRow.lineIndex;
+                
+                let j = i + 1;
+                while (j < tableMatches.length && tableMatches[j].lineIndex === tableMatches[j-1].lineIndex + 1) {
+                    if (!tableMatches[j].isSeparator) {
+                        tableRows.push(tableMatches[j].cells);
+                    }
+                    j++;
+                }
+                
+                const tableHtml = '<table class="rendered-table"><thead><tr>' + 
+                    tableRows[0].map(c => `<th>${c}</th>`).join('') + 
+                    '</tr></thead><tbody>' +
+                    tableRows.slice(1).map(row => '<tr>' + row.map(c => `<td>${c}</td>`).join('') + '</tr>').join('') +
+                    '</tbody></table>';
+                
+                processedTables.push({
+                    startIndex: startIdx,
+                    html: tableHtml,
+                    rowCount: tableRows.length
+                });
+                
+                i = j;
+            }
+            
+            if (processedTables.length > 0) {
+                let result = '';
+                let currentPos = 0;
+                
+                for (const tbl of processedTables) {
+                    const tableLines = tbl.rowCount;
+                    const beforeTable = html.split('\n').slice(currentPos, tbl.startIndex).join('\n');
+                    result += beforeTable + '\n' + tbl.html + '\n';
+                    currentPos = tbl.startIndex + tableLines;
+                }
+                
+                const remaining = html.split('\n').slice(currentPos).join('\n');
+                result += remaining;
+                
+                result = result.replace(/^\s*\|.+\|\s*$/gm, '').replace(/^\s*\|[-:\s|]+\|\s*$/gm, '');
+                html = result;
+            }
         }
         
         html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
