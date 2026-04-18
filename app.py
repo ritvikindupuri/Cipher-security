@@ -68,7 +68,7 @@ def run_analysis():
                 "category": cmd_log.category,
                 "description": cmd_log.description,
                 "status": cmd_log.status,
-                "output": cmd_log.output[:500] if cmd_log.output else "",
+                "output": cmd_log.output[:1500] if cmd_log.output else "",
                 "error": cmd_log.error[:500] if cmd_log.error else "",
                 "duration_ms": cmd_log.duration_ms
             })

@@ -475,9 +475,61 @@
         .agent-output-subtitle { font-size: 10px; color: var(--text-secondary); }
 
         .agent-output-content {
-            padding: 12px;
+            padding: 16px;
             flex: 1;
             overflow: visible;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .agent-output-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 12px;
+        }
+
+        .agent-output-content th,
+        .agent-output-content td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .agent-output-content th {
+            background: #f5f5f7;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .agent-output-content tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .agent-output-content p {
+            margin: 8px 0;
+            color: #333;
+        }
+
+        .agent-output-content h1,
+        .agent-output-content h2,
+        .agent-output-content h3 {
+            margin: 16px 0 8px 0;
+            color: #1d1d1f;
+        }
+
+        .agent-output-content pre {
+            margin: 12px 0;
+            padding: 12px;
+            background: #0d0d12;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .agent-output-content code {
+            color: #ff9f43;
+            font-family: "SF Mono", "Consolas", monospace;
+            font-size: 12px;
         }
 
         .scenario-table-container {
@@ -575,9 +627,6 @@
             word-break: break-all;
             color: #ff9f43;
             display: block;
-        }
-            border-top: 1px solid var(--border);
-            margin: 20px 0;
         }
     </style>
 </head>

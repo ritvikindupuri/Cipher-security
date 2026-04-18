@@ -327,7 +327,7 @@ class CipherDashboard {
         }
 
         if (status === 'success' && output) {
-            this.log('output', 'System', output.substring(0, 300));
+            this.log('output', 'System', output.substring(0, 800));
             
             if (category === 'CPU') {
                 const match = output.match(/(\d+\.?\d*)%/);
