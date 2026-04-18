@@ -183,8 +183,8 @@ class CipherDashboard {
                 
                 for (const tbl of processedTables) {
                     const tableLines = tbl.rowCount;
-                    const beforeTable = html.split('\n').slice(currentPos, tbl.startIndex).join('\n');
-                    result += beforeTable + '\n' + tbl.html + '\n';
+                    const beforeTable = html.split('\n').slice(currentPos, tbl.startIndex).join('\n').replace(/\n+$/, '');
+                    result += beforeTable + '\n' + tbl.html;
                     currentPos = tbl.startIndex + tableLines;
                 }
                 
@@ -226,7 +226,9 @@ class CipherDashboard {
         
         html = html.replace(/^---$/gm, '<hr>');
         
-        html = html.replace(/\n/g, '<br>');
+        html = html.replace(/\n+/g, '<br>');
+        
+        html = html.replace(/<br><br><br>/g, '<br><br>');
         
         html = html.replace(/\n\n/g, '</p><p>');
         html = '<p>' + html + '</p>';
