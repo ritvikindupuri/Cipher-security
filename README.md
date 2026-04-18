@@ -34,6 +34,8 @@ Watch analysis unfold in real-time. Telemetry collection appears command-by-comm
 
 ## System Architecture
 
+<h3 align="center">System Architecture Diagram</h3>
+
 <figure>
 <p align="center">
   <img src="docs/architecture.png" alt="System Architecture Diagram" width="850"/>
@@ -41,23 +43,32 @@ Watch analysis unfold in real-time. Telemetry collection appears command-by-comm
 <figcaption align="center"><b>Figure 1:</b> System Architecture</figcaption>
 </figure>
 
-The system consists of four layers that work sequentially to collect, process, analyze, and report on system telemetry.
+### Architecture Flow Explanation
 
-**Layer 1: Data Collection**
+The system follows a sequential flow from raw data collection to AI analysis and dashboard visualization.
 
-The LoggingCollector module uses psutil to execute system calls for cpu_percent, process_iter, net_connections, disk_usage, and virtual_memory. Each command is logged with its timestamp, raw output, execution duration, and success status. Events stream to the dashboard via Server-Sent Events.
+**1. Windows System**
 
-**Layer 2: AI Processing**
+The process begins at the operating system level, capturing essential raw metrics directly via OS APIs. The collected data points include real-time utilization of CPU, Memory, Disk, Network connections, and active Processes running on the host.
 
-The Agent Chain sends telemetry to three AI agent instances. Agent 1 (Observations) extracts factual observations from raw data. Agent 2 (Threats) maps attack surface and risks. Agent 3 (Detection Engineering) generates actionable detection rules and SIEM queries. All responses stream token-by-token to the dashboard.
+**2. LoggingCollector (psutil)**
 
-**Layer 3: Dashboard Display**
+A robust Python-based module acts as the collection engine. Leveraging the `psutil` library, it executes specific granular functions such as `cpu_percent()`, `process_iter()`, `net_connections()`, `disk_usage()`, and `virtual_memory()` to aggregate system states reliably.
 
-Flask hosts the web interface and API endpoints. The Command Log tab displays system commands and raw outputs in terminal format. The Visualizations tab shows charts and data tables. The Agent Outputs tab shows full Claude AI analysis.
+**3. Telemetry**
 
-**Layer 4: Report Generation**
+The raw data is then refined and structured into detailed telemetry. Each metric is tagged with accurate timestamps and raw outputs, effectively generating a comprehensive JSON payload. This payload is paired with system prompts designed to guide the upcoming AI analysis.
 
-ReportLab generates professional PDF reports containing system overview, telemetry summary, threat analysis, MITRE ATT&CK scenarios, and all agent outputs. Reports download after analysis completes.
+**4. Agent Chain**
+
+This critical phase passes the structured JSON payload through a sequential chain of specialized AI agents:
+- **Agent 1 - Observation Agent**: Systematically parses and analyzes the raw system telemetry to identify baseline anomalies and factual findings.
+- **Agent 2 - Threat Agent**: Takes the observations and comprehensively maps out the attack surface, assessing potential vulnerabilities or malicious activities.
+- **Agent 3 - Detection Engineering Agent**: Leverages the identified threats to develop and output actionable detection rules and SIEM-ready hunting queries.
+
+**5. Web Dashboard**
+
+In the final step, the platform streams the raw collected system commands, visual metrics, and the token-by-token AI thinking process directly to an interactive Web Dashboard. This allows users to observe the analytical flow and threat detection in real-time.
 
 ---
 
@@ -68,7 +79,7 @@ ReportLab generates professional PDF reports containing system overview, telemet
 | Backend | Python 3.10+ | Core logic and processing |
 | Web Server | Flask | HTTP API and SSE streaming |
 | Telemetry | psutil | System metrics collection |
-| AI Provider | Anthropic Claude | Language model analysis |
+| AI Provider | Anthropic Claude (claude-sonnet-4-20250514) | Language model analysis |
 | Frontend | Vanilla JS | Dashboard interface |
 | Styling | CSS (Apple Design) | Modern UI |
 | PDF | ReportLab | Report generation |
