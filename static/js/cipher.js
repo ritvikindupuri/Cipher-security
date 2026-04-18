@@ -121,29 +121,6 @@ class CipherDashboard {
         
         let html = this.escapeHtml(text);
         
-        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-        
-        html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-            const label = lang ? lang.toUpperCase() : 'QUERY';
-            return `<pre><code>${code}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>`;
-        });
-        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-        
-        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-        
-        html = html.replace(/(Severity:\s*)(HIGH|MEDIUM|LOW)/gi, (match, prefix, level) => {
-            let explanation = '';
-            if (level.toUpperCase() === 'HIGH') explanation = 'Significant exposure or critical asset at risk';
-            else if (level.toUpperCase() === 'MEDIUM') explanation = 'Moderate exposure or partial visibility';
-            else if (level.toUpperCase() === 'LOW') explanation = 'Minimal exposure or good controls in place';
-            return `${prefix}${level} <span style="color: #888; font-size: 11px;">(${level} - ${explanation})</span>`;
-        });
-        
-        html = html.replace(/^\> (.+)$/gm, '<blockquote>$1</blockquote>');
-        
         const tableRows = [];
         const separatorIndices = [];
         const lines = html.split('\n');
@@ -181,13 +158,37 @@ class CipherDashboard {
             html += '\n' + tableHtml;
         }
         
-        html = html.replace(/\n\n+/g, '<br><br>');
-        html = html.replace(/\n/g, '<br>');
+        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+        
+        html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+            const label = lang ? lang.toUpperCase() : 'QUERY';
+            return `<pre><code>${code}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>`;
+        });
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        
+        html = html.replace(/(Severity:\s*)(HIGH|MEDIUM|LOW)/gi, (match, prefix, level) => {
+            let explanation = '';
+            if (level.toUpperCase() === 'HIGH') explanation = 'Significant exposure or critical asset at risk';
+            else if (level.toUpperCase() === 'MEDIUM') explanation = 'Moderate exposure or partial visibility';
+            else if (level.toUpperCase() === 'LOW') explanation = 'Minimal exposure or good controls in place';
+            return `${prefix}${level} <span style="color: #888; font-size: 11px;">(${level} - ${explanation})</span>`;
+        });
+        
+        html = html.replace(/^\> (.+)$/gm, '<blockquote>$1</blockquote>');
+        
+        html = html.replace(/\n\n+/g, '\n\n');
         
         html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
         html = html.replace(/(<li>.*<\/li>\s*)+/g, '<ul>$&</ul>');
         
         html = html.replace(/^---$/gm, '<hr>');
+        
+        html = html.replace(/\n/g, '<br>');
         
         html = html.replace(/\n\n/g, '</p><p>');
         html = '<p>' + html + '</p>';
