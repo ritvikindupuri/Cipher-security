@@ -53,7 +53,7 @@ The Agent Chain sends telemetry to three AI agent instances. Agent 1 (Observatio
 
 **Layer 3: Dashboard Display**
 
-Flask hosts the web interface and API endpoints. The Command Log tab displays system commands and raw outputs in terminal format. The Visualizations tab shows charts and data tables. The Agent Outputs tab shows full DeepSeek AI analysis.
+Flask hosts the web interface and API endpoints. The Command Log tab displays system commands and raw outputs in terminal format. The Visualizations tab shows charts and data tables. The Agent Outputs tab shows full Claude AI analysis.
 
 **Layer 4: Report Generation**
 
@@ -151,22 +151,6 @@ ANTHROPIC_MODEL=claude-sonnet-4-20250514
 - `ANTHROPIC_API_KEY` authenticates your requests to Anthropic's servers
 - `ANTHROPIC_MODEL` specifies which Claude model to use for all three agents
 
-**Alternative: Using DeepSeek**
-If you prefer DeepSeek instead, you can use:
-```bash
-USE_DEEPSEEK=1
-DEEPSEEK_API_KEY=sk-your-key-here
-DEEPSEEK_MODEL=deepseek-chat
-```
-
-**Alternative: Using OpenRouter**
-OpenRouter provides another alternative:
-```bash
-USE_OPENROUTER=1
-OPENROUTER_API_KEY=sk-or-v1-your-key-here
-OPENROUTER_MODEL=deepseek/deepseek-chat-v3
-```
-
 ### Step 6: Run the Dashboard
 ```bash
 python app.py
@@ -179,7 +163,7 @@ Navigate to http://127.0.0.1:5000
 1. Click **"Execute Analysis"**
 2. Watch telemetry collection in the **Command Log** tab
 3. Switch to **Visualizations** to see live charts
-4. Switch to **Agent Outputs** to see full DeepSeek analysis
+4. Switch to **Agent Outputs** to see full Claude analysis
 5. Download PDF report when complete
 
 ---
