@@ -43,30 +43,32 @@ Watch analysis unfold in real-time. Telemetry collection appears command-by-comm
 <figcaption align="center"><b>Figure 1:</b> System Architecture</figcaption>
 </figure>
 
-The system follows a sequential flow from raw data collection to AI analysis and dashboard visualization.
+### Architecture Explanation
+
+The system follows a sequential data pipeline that starts with extracting raw system metrics, processes them into structured telemetry, analyzes the findings using an AI agent chain, and presents the actionable intelligence on an interactive dashboard.
 
 **1. Windows System**
 
-The system begins by extracting raw metrics via OS APIs, capturing essential data points such as CPU, Memory, Disk, Network, and Processes.
+The process originates at the operating system level, capturing critical data points via OS APIs. The fundamental metrics extracted include CPU utilization, Memory allocation, Disk usage, Network activities, and detailed information about running Processes. This provides the foundational state of the target system.
 
 **2. LoggingCollector (psutil)**
 
-A Python-based collector leverages `psutil` to execute specific functions (`cpu_percent()`, `process_iter()`, `net_connections()`, `disk_usage()`, and `virtual_memory()`).
+A specialized Python module, leveraging the `psutil` cross-platform library, serves as the primary data collection mechanism. It executes specific functions such as `cpu_percent()`, `virtual_memory()`, `disk_usage()`, `net_connections()`, and `process_iter()`. This layer is responsible for periodically sampling the system's runtime state to gather raw operational data securely and efficiently.
 
 **3. Telemetry**
 
-The raw data is structured into telemetry with timestamps and outputs, generating a JSON payload alongside system prompts to feed into the AI layer.
+The raw measurements collected by the `LoggingCollector` are aggregated and structured into a standardized JSON payload. Each data point is annotated with precise timestamps and output logs. This telemetry payload, combined with engineered system prompts, forms the necessary input to feed into the AI analytical layer.
 
 **4. Agent Chain**
 
-The telemetry payload is passed to a chain of specialized AI agents:
-- **Agent 1 - Observation Agent**: Analyzes the raw system telemetry.
-- **Agent 2 - Threat Agent**: Maps the attack surface based on the observations.
-- **Agent 3 - Detection Engineering Agent**: Develops actionable detection rules.
+The structured telemetry is processed by a sequential pipeline consisting of three specialized AI models:
+- **Agent 1 - Observation Agent**: This agent ingests the raw telemetry JSON and distills factual, unbiased security findings from the data.
+- **Agent 2 - Threat Agent**: Operating on the findings of Agent 1, it maps potential vulnerabilities, identifies exposed attack surfaces, and correlates data with known risks.
+- **Agent 3 - Detection Engineering Agent**: Taking the threat profile from Agent 2, this final agent creates concrete, actionable defense scenarios, generating detection rules and SIEM hunting queries tailored to the observed environment.
 
 **5. Web Dashboard**
 
-Finally, the system streams the collected system commands and the AI thinking process directly to the Web Dashboard for real-time monitoring and analysis.
+The culminating point of the architecture is the interactive Web Dashboard. Using Server-Sent Events (SSE), it streams the telemetry collection process, live command execution logs, and the continuous output from each phase of the AI Agent Chain. This allows users to monitor the complete analytical process in real-time, visualizing both raw metrics and the generated threat intelligence.
 
 ---
 
@@ -77,7 +79,7 @@ Finally, the system streams the collected system commands and the AI thinking pr
 | Backend | Python 3.10+ | Core logic and processing |
 | Web Server | Flask | HTTP API and SSE streaming |
 | Telemetry | psutil | System metrics collection |
-| AI Provider | Anthropic Claude | Language model analysis |
+| AI Provider | Anthropic Claude (`claude-sonnet-4-20250514`) | Language model analysis |
 | Frontend | Vanilla JS | Dashboard interface |
 | Styling | CSS (Apple Design) | Modern UI |
 | PDF | ReportLab | Report generation |
