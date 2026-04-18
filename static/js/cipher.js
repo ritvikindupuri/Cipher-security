@@ -472,12 +472,7 @@ class CipherDashboard {
                 icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>';
         }
 
-        block.innerHTML = `
-            <span class="log-timestamp">${this.getTimestamp()}</span>
-            <span class="agent-badge ${agentClass}">${agent}</span>
-            <span class="log-icon">${icon}</span>
-            <span class="log-message">${content}</span>
-        `;
+        block.innerHTML = `<div style="margin: 4px 0; font-family: monospace; font-size: 12px;">${content}</div>`;
 
         this.commandLog.appendChild(block);
         this.scrollLog();
