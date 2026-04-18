@@ -4,7 +4,7 @@ An AI-powered security analysis platform that transforms raw Windows telemetry i
 
 Most security tools overwhelm you with raw data and leave the analysis to you. This platform takes a different approach - it collects your system's real-time metrics and uses specialized AI agents to surface what actually matters. CPU spikes, unusual network connections, suspicious processes - the platform analyzes all of it and tells you what's worth your attention.
 
-The platform uses three AI agents that work together: one extracts meaningful observations from raw telemetry, another maps those observations to potential threats, and a third generates defensive scenarios based on real findings. Each agent builds on the last, creating a complete picture from scattered metrics.
+The platform uses four AI agents that work together: one extracts meaningful observations from raw telemetry, another maps those observations to potential threats, a third generates defensive scenarios based on real findings, and the fourth creates a final executive summary. Each agent builds on the last, creating a complete picture from scattered metrics.
 
 Threats are automatically mapped to the MITRE ATT&CK framework, so you see not just what's abnormal, but how it fits into known attack patterns. Reports export to PDF for documentation or sharing. The entire analysis pipeline is visible - you see every command run, every AI decision made, every finding surfaced.
 
@@ -61,10 +61,11 @@ The raw measurements collected by the `LoggingCollector` are aggregated and stru
 
 **4. Agent Chain**
 
-The structured telemetry is processed by a sequential pipeline consisting of three specialized AI models:
+The structured telemetry is processed by a sequential pipeline consisting of four specialized AI models:
 - **Agent 1 - Observation Agent**: This agent ingests the raw telemetry JSON and distills factual, unbiased security findings from the data.
 - **Agent 2 - Threat Agent**: Operating on the findings of Agent 1, it maps potential vulnerabilities, identifies exposed attack surfaces, and correlates data with known risks.
 - **Agent 3 - Detection Engineering Agent**: Taking the threat profile from Agent 2, this final agent creates concrete, actionable defense scenarios, generating detection rules and SIEM hunting queries tailored to the observed environment.
+- **Agent 4 - Summary Agent**: Synthesizes the outputs of the previous three agents into a high-level Executive Summary, comprehensive Conclusion, and Chart Analysis, making the data highly digestible for Security Engineers in the final report.
 
 **5. Web Dashboard**
 
@@ -235,6 +236,11 @@ Each agent is designed for accuracy and honesty:
 - Generates actual detection rules based on identified risks
 - Creates SIEM/hunting queries from real telemetry
 - Provides indicators and next steps grounded in actual observations
+
+### Agent 4: Summary Agent
+- Consolidates the outputs into a focused narrative for Security Engineers
+- Extracts the signal from the noise
+- Ties technical findings to security posture recommendations
 
 The app is designed to be a **security analyst tool**, not a threat generator. It tells you what it sees, what risks are observable, and how to detect them - nothing more.
 
