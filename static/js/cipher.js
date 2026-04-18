@@ -483,12 +483,22 @@ class CipherDashboard {
             document.getElementById('metricDisk').textContent = val + '%';
         }
         
-        const netMatch = output.match(/(?:Network|Connections|Listening Ports)[:\s]*(\d+)/i);
+        const netMatch = output.match(/(?:Network|Connections|Listening Ports)[:\s]*(\d+)/i) || output.match(/Listening ports[:\s]*(\d+)/i) || output.match(/Established connections[:\s]*(\d+)/i);
         if (netMatch) {
             const val = netMatch[1];
             document.getElementById('metricNet').textContent = val;
             document.getElementById('chartNet').style.width = Math.min(val, 100) + '%';
             document.getElementById('chartNetVal').textContent = val;
+        } else {
+            const allNumbers = output.match(/\b(\d+)\b/g);
+            if (allNumbers && allNumbers.length > 0) {
+                const likelyConn = allNumbers.find(n => parseInt(n) > 0 && parseInt(n) < 1000);
+                if (likelyConn) {
+                    document.getElementById('metricNet').textContent = likelyConn;
+                    document.getElementById('chartNet').style.width = Math.min(parseInt(likelyConn), 100) + '%';
+                    document.getElementById('chartNetVal').textContent = likelyConn;
+                }
+            }
         }
         
         const processTable = document.getElementById('processTable');
