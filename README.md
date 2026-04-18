@@ -1,6 +1,6 @@
 # Scry – AI-Powered Windows Threat Intelligence Platform
 
-An AI-powered security analysis platform that transforms raw Windows telemetry into actionable threat intelligence.
+Scry is an AI-powered security analysis platform that transforms raw Windows telemetry into actionable threat intelligence.
 
 Most security tools overwhelm you with raw data and leave the analysis to you. This platform takes a different approach - it collects your system's real-time metrics and uses specialized AI agents to surface what actually matters. CPU spikes, unusual network connections, suspicious processes - the platform analyzes all of it and tells you what's worth your attention.
 
