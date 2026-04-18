@@ -353,6 +353,8 @@ class CipherDashboard {
         console.log('Agent chunk received:', agent, 'output length:', full_output ? full_output.length : 0);
         this.agentOutputs[agent] = full_output;
         
+        console.log('Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this)).filter(p => p.includes('update')));
+        
         const agentName = this.AGENT_NAMES[agent] || agent;
         const agentClass = this.AGENT_CLASSES[agent] || 'system';
 
@@ -374,8 +376,10 @@ class CipherDashboard {
         if (agent === 'agent1') {
             this.updateObservationsViz(full_output);
         } else if (agent === 'agent2') {
+            console.log('Calling updateThreatsViz...');
             this.updateThreatsViz(full_output);
         } else if (agent === 'agent3') {
+            console.log('Calling updateScenariosViz...');
             this.updateScenariosViz(full_output);
         }
         
@@ -596,6 +600,188 @@ class CipherDashboard {
         
 if (html) {
             processTable.innerHTML = html;
+        }
+    }
+
+    updateThreatsViz(output) {
+        const threatList = document.getElementById('threatList');
+        const threats = [];
+        
+        const lines = output.split('\n');
+        let currentRisk = null;
+        
+        for (const line of lines) {
+            const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
+            
+            if (cleanLine.match(/\*\*Risk:\*\*/i) || cleanLine.match(/^\*\*Risk:\*\*/i)) {
+                if (currentRisk && currentRisk.title) {
+                    threats.push(currentRisk);
+                }
+                const title = cleanLine.replace(/\*\*/g, '').replace(/Risk:/i, '').trim();
+                currentRisk = { title: title, severity: 'medium', evidence: '', mitre: [], action: '' };
+            }
+            
+            if (currentRisk) {
+                if (cleanLine.match(/\*\*Severity:\*\*/i)) {
+                    const sev = cleanLine.replace(/\*\*/g, '').replace(/Severity:/i, '').trim().toUpperCase();
+                    currentRisk.severity = sev.includes('HIGH') || sev.includes('CRIT') ? 'high' : sev.includes('LOW') ? 'low' : 'medium';
+                }
+                if (cleanLine.match(/\*\*Evidence:\*\*/i)) {
+                    currentRisk.evidence = cleanLine.replace(/\*\*/g, '').replace(/Evidence:/i, '').trim();
+                }
+                if (cleanLine.match(/\*\*MITRE/i)) {
+                    const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
+                    currentRisk.mitre = mitres;
+                }
+                if (cleanLine.match(/\*\*Recommended Action:\*\*/i)) {
+                    currentRisk.action = cleanLine.replace(/\*\*/g, '').replace(/Recommended Action:/i, '').trim();
+                }
+            }
+            
+            if (cleanLine.match(/Attack Surface| Hypotheses|Missing Visibility/i) && currentRisk) {
+                threats.push(currentRisk);
+                currentRisk = null;
+            }
+        }
+        
+        if (currentRisk && currentRisk.title) {
+            threats.push(currentRisk);
+        }
+        
+        if (threats.length === 0) {
+            for (const line of lines) {
+                const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
+                if (cleanLine.match(/HIGH|MEDIUM|LOW/i) && cleanLine.includes(':') && cleanLine.length > 10) {
+                    const sevMatch = cleanLine.match(/severity[:\s]*(\w+)/i);
+                    let severity = 'medium';
+                    if (sevMatch) {
+                        const sev = sevMatch[1].toUpperCase();
+                        severity = sev.includes('HIGH') || sev.includes('CRIT') ? 'high' : sev.includes('LOW') ? 'low' : 'medium';
+                    }
+                    const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
+                    threats.push({
+                        title: cleanLine,
+                        severity: severity,
+                        evidence: '',
+                        mitre: mitres,
+                        action: ''
+                    });
+                    if (threats.length >= 5) break;
+                }
+            }
+        }
+        
+        if (threats.length > 0) {
+            threatList.innerHTML = threats.slice(0, 8).map(t => `
+                <div style="padding: 12px; margin-bottom: 8px; border-radius: 6px; background: ${t.severity === 'high' ? '#ffe6e6' : t.severity === 'medium' ? '#fff3e6' : '#e6f4ea'}; border: 1px solid ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background: ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};"></div>
+                        <span style="font-size: 10px; font-weight: 600; color: ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};">${t.severity.toUpperCase()}</span>
+                    </div>
+                    <div style="font-weight: 600; font-size: 13px; color: #1d1d1f; margin-bottom: 4px;">${this.escapeHtml(t.title)}</div>
+                    ${t.evidence ? `<div style="font-size: 11px; color: #666; margin-bottom: 4px;"><strong>Evidence:</strong> ${this.escapeHtml(t.evidence.substring(0, 200))}</div>` : ''}
+                    ${t.action ? `<div style="font-size: 11px; color: #0071e3; margin-bottom: 4px;"><strong>Action:</strong> ${this.escapeHtml(t.action.substring(0, 150))}</div>` : ''}
+                    ${t.mitre.length > 0 ? '<div style="margin-top: 6px;">' + t.mitre.slice(0, 4).map(m => `<span style="margin-right: 4px; font-size: 10px; padding: 2px 6px; background: #eaeaeb; border-radius: 4px;">${m}</span>`).join('') + '</div>' : ''}
+                </div>
+            `).join('');
+        } else {
+            threatList.innerHTML = '<div style="color: #666; font-size: 12px; padding: 12px;">No significant risks detected. View full analysis in Agent Outputs tab.</div>';
+        }
+    }
+
+    updateScenariosViz(output) {
+        const tbody = document.getElementById('scenarioTable');
+        const lines = output.split('\n');
+        
+        const priorities = [];
+        const detectionRules = [];
+        let currentRule = null;
+        let nextSteps = [];
+        const mitres = [];
+        
+        for (const line of lines) {
+            const cleanLine = line.replace(/^[\s\-\*\>\#\|]+/, '').trim();
+            
+            const mitreMatch = cleanLine.match(/T\d{4}[\.\d]*/g);
+            if (mitreMatch) {
+                mitres.push(...mitreMatch);
+            }
+            
+            if (cleanLine.match(/\*\*Detection Rule \d+:/i) || cleanLine.match(/^\*\*[A-Za-z ]+Rule/i)) {
+                if (currentRule) detectionRules.push(currentRule);
+                const name = cleanLine.replace(/\*\*/g, '').replace(/:/g, '').trim();
+                currentRule = { name: name, monitor: '', condition: '' };
+            }
+            
+            if (currentRule) {
+                if (cleanLine.match(/\*\*What to monitor:\*\*/i)) {
+                    currentRule.monitor = cleanLine.replace(/\*\*/g, '').replace(/What to monitor:/i, '').trim();
+                }
+                if (cleanLine.match(/\*\*Condition:\*\*/i)) {
+                    currentRule.condition = cleanLine.replace(/\*\*/g, '').replace(/Condition:/i, '').trim();
+                }
+            }
+            
+            if (cleanLine.match(/^\d+\.\s+/)) {
+                nextSteps.push(cleanLine);
+            }
+        }
+        
+        if (currentRule) detectionRules.push(currentRule);
+        
+        // Remove duplicates from mitres
+        const uniqueMitres = [...new Set(mitres)];
+        
+        if (uniqueMitres.length > 0 || detectionRules.length > 0 || nextSteps.length > 0) {
+            let rows = '';
+            
+            if (uniqueMitres.length > 0) {
+                rows += `<tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 12px; font-weight: 600; background: #f5f5f7; color: #1d1d1f;">MITRE ATT&CK Techniques</td>
+                    <td style="padding: 12px; background: #f5f5f7;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+                            ${uniqueMitres.slice(0, 12).map(m => `<span style="padding: 4px 10px; background: #eaeaeb; border-radius: 4px; font-size: 11px; font-weight: 600; color: #333;">${m}</span>`).join(' ')}
+                        </div>
+                        ${uniqueMitres.length > 12 ? `<div style="font-size: 10px; color: #666;">+ ${uniqueMitres.length - 12} more techniques</div>` : ''}
+                    </td>
+                </tr>`;
+            }
+            
+            if (detectionRules.length > 0) {
+                rows += `<tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 12px; font-weight: 600; color: #1d1d1f;">Detection Rules</td>
+                    <td style="padding: 12px;">
+                        <div style="font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">${detectionRules.length} Rules Generated</div>
+                        ${detectionRules.slice(0, 3).map(r => `
+                            <div style="padding: 8px; margin-bottom: 6px; background: #f0f9ff; border-left: 3px solid #0071e3; border-radius: 4px;">
+                                <div style="font-weight: 600; font-size: 12px; color: #1d1d1f;">${this.escapeHtml(r.name || 'Detection Rule')}</div>
+                                ${r.monitor ? `<div style="font-size: 10px; color: #666; margin-top: 4px;"><strong>Monitor:</strong> ${this.escapeHtml(r.monitor.substring(0, 80))}</div>` : ''}
+                                ${r.condition ? `<div style="font-size: 10px; color: #666; margin-top: 2px;"><strong>Condition:</strong> ${this.escapeHtml(r.condition.substring(0, 80))}</div>` : ''}
+                            </div>
+                        `).join('')}
+                        <div style="font-size: 11px; color: #666; margin-top: 8px;">View all ${detectionRules.length} rules in Agent Outputs tab</div>
+                    </td>
+                </tr>`;
+            }
+            
+            if (nextSteps.length > 0) {
+                rows += `<tr>
+                    <td style="padding: 12px; font-weight: 600; color: #1d1d1f;">Recommended Actions</td>
+                    <td style="padding: 12px;">
+                        <ol style="margin: 0; padding-left: 20px; font-size: 12px; color: #1d1d1f;">
+                            ${nextSteps.slice(0, 5).map(s => `<li style="margin: 8px 0; padding: 6px; background: #f5f5f7; border-radius: 4px;">${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 200))}</li>`).join('')}
+                        </ol>
+                    </td>
+                </tr>`;
+            }
+            
+            if (rows) {
+                tbody.innerHTML = rows;
+            } else {
+                tbody.innerHTML = `<tr><td colspan="2" style="padding: 20px; text-align: center; color: #666;">View complete detection rules in Agent Outputs tab</td></tr>`;
+            }
+        } else {
+            tbody.innerHTML = `<tr><td colspan="2" style="padding: 20px; text-align: center; color: #666;">Awaiting detection analysis...</td></tr>`;
         }
     }
 
