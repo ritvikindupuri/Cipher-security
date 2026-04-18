@@ -23,7 +23,7 @@ class CipherDashboard {
         this.AGENT_CLASSES = {
             'agent1': 'observations',
             'agent2': 'threats',
-            'agent3': 'detection'
+            'agent3': 'scenarios'
         };
 
         this.THINKING_MESSAGES = {
@@ -48,14 +48,14 @@ class CipherDashboard {
                 'Documenting threat intelligence findings...'
             ],
             'agent3': [
-                'Synthesizing threat intelligence into detection rules...',
-                'Constructing SIEM queries for threat detection...',
+                'Synthesizing threat intelligence into defensive scenarios...',
+                'Constructing MITRE ATT&CK aligned attack chains...',
                 'Defining detection requirements for each phase...',
                 'Mapping attack progression from initial access to impact...',
                 'Identifying telemetry gaps in current coverage...',
-                'Generating detection rule recommendations...',
-                'Developing hunting queries for proactive detection...',
-                'Finalizing defensive rule documentation...'
+                'Generating tabletop exercise narrative...',
+                'Developing detection rule recommendations...',
+                'Finalizing defensive scenario documentation...'
             ]
         };
 
@@ -101,7 +101,7 @@ class CipherDashboard {
         const outputMap = {
             'observations': this.agentOutputs.agent1,
             'threats': this.agentOutputs.agent2,
-            'detection': this.agentOutputs.agent3
+            'scenarios': this.agentOutputs.agent3
         };
         
         const output = outputMap[this.currentFullOutputTab];
@@ -111,7 +111,7 @@ class CipherDashboard {
             outputEl.innerHTML = this.renderMarkdown(output);
         } else {
             outputEl.classList.add('loading');
-            const agentNames = { observations: 'Observations', threats: 'Threats', detection: 'Detection' };
+            const agentNames = { observations: 'Observations', threats: 'Threats', scenarios: 'Scenarios' };
             outputEl.textContent = 'Awaiting ' + agentNames[this.currentFullOutputTab] + ' output...';
         }
     }
@@ -288,30 +288,22 @@ class CipherDashboard {
             if (status === 'complete') {
                 this.updateStep(1, 'complete');
                 this.updateStep(2, 'active');
-                this.log('success', 'System', '✓ Telemetry collection complete. Starting Observation Agent...');
-            } else if (status === 'starting') {
-                this.log('info', 'System', '→ Collecting system telemetry...');
+                this.log('success', 'System', message);
             }
         } else if (phase === 'agent1' && status === 'starting') {
             this.updateStep(2, 'active');
             this.logSection('OBSERVATION AGENT', 'observations');
-            this.log('info', 'System', '→ Observation Agent analyzing telemetry data...');
-        } else if (phase === 'agent1' && status === 'complete') {
-            this.log('success', 'System', '✓ Observation complete. Passing to Threat Agent...');
+            this.log('info', 'System', 'Observation Agent is starting analysis of system telemetry...');
         } else if (phase === 'agent2' && status === 'starting') {
             this.updateStep(2, 'complete');
             this.updateStep(3, 'active');
             this.logSection('THREAT AGENT', 'threats');
-            this.log('info', 'System', '→ Threat Agent mapping attack surface...');
-        } else if (phase === 'agent2' && status === 'complete') {
-            this.log('success', 'System', '✓ Threat analysis complete. Passing to Detection Agent...');
+            this.log('info', 'System', 'Threat Agent is starting attack surface mapping...');
         } else if (phase === 'agent3' && status === 'starting') {
             this.updateStep(3, 'complete');
             this.updateStep(4, 'active');
-            this.logSection('DETECTION AGENT', 'detection');
-            this.log('info', 'System', '→ Detection Agent generating detection rules...');
-        } else if (phase === 'agent3' && status === 'complete') {
-            this.log('success', 'System', '✓ Detection rules generated.');
+            this.logSection('SCENARIO AGENT', 'scenarios');
+            this.log('info', 'System', 'Scenario Agent is starting MITRE ATT&CK scenario generation...');
         } else if (phase === 'complete') {
             this.updateStep(4, 'complete');
         }
@@ -327,7 +319,7 @@ class CipherDashboard {
         }
 
         if (status === 'success' && output) {
-            this.log('output', 'System', output.substring(0, 800));
+            this.log('output', 'System', output.substring(0, 300));
             
             if (category === 'CPU') {
                 const match = output.match(/(\d+\.?\d*)%/);
@@ -440,7 +432,7 @@ class CipherDashboard {
         const agentClass = agent === 'System' ? 'system' : 
                           agent === 'Observations' ? 'observations' :
                           agent === 'Threats' ? 'threats' :
-                          agent === 'Detection' ? 'detection' : 'system';
+                          agent === 'Scenarios' ? 'scenarios' : 'system';
 
         let icon = '';
         let content = this.escapeHtml(message);
@@ -460,7 +452,7 @@ class CipherDashboard {
                 content = message;
                 break;
             case 'output':
-                icon = '<svg viewBox="0 0 24 24" fill="none" stroke="#00ccff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+                icon = '<svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
                 break;
             case 'thinking':
                 icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -472,7 +464,12 @@ class CipherDashboard {
                 icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>';
         }
 
-        block.innerHTML = `<div style="margin: 4px 0; font-family: monospace; font-size: 12px;">${content}</div>`;
+        block.innerHTML = `
+            <span class="log-timestamp">${this.getTimestamp()}</span>
+            <span class="agent-badge ${agentClass}">${agent}</span>
+            <span class="log-icon">${icon}</span>
+            <span class="log-message">${content}</span>
+        `;
 
         this.commandLog.appendChild(block);
         this.scrollLog();
@@ -764,36 +761,11 @@ if (html) {
         const tbody = document.getElementById('scenarioTable');
         const lines = output.split('\n');
         
+        const priorities = [];
         const detectionRules = [];
         let currentRule = null;
         let nextSteps = [];
         const mitres = [];
-        let priorityTable = null;
-        
-        const linesForTable = [];
-        let inTable = false;
-        for (const line of lines) {
-            const cleanLine = line.trim();
-            if (cleanLine.startsWith('|') && cleanLine.endsWith('|')) {
-                inTable = true;
-                linesForTable.push(cleanLine);
-            } else if (inTable) {
-                inTable = false;
-            }
-        }
-        
-        if (linesForTable.length > 0) {
-            const rows = [];
-            for (const line of linesForTable) {
-                const cells = line.split('|').filter(c => c.trim());
-                if (cells.length > 0 && !cells.every(c => /^[-:]+$/.test(c.trim()))) {
-                    rows.push(cells.map(c => c.trim()));
-                }
-            }
-            if (rows.length > 1) {
-                priorityTable = rows;
-            }
-        }
         
         for (const line of lines) {
             const cleanLine = line.replace(/^[\s\-\*\>\#\|]+/, '').trim();
@@ -828,28 +800,8 @@ if (html) {
         // Remove duplicates from mitres
         const uniqueMitres = [...new Set(mitres)];
         
-        if (uniqueMitres.length > 0 || detectionRules.length > 0 || nextSteps.length > 0 || priorityTable) {
+        if (uniqueMitres.length > 0 || detectionRules.length > 0 || nextSteps.length > 0) {
             let rows = '';
-            
-            if (priorityTable) {
-                rows += `<tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 12px; font-weight: 600; background: #f5f5f7; color: #1d1d1f; width: 30%;">Detection Priorities</td>
-                    <td style="padding: 12px; background: #f5f5f7;">
-                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid #ddd;">
-                                    ${priorityTable[0].map(h => `<th style="padding: 8px; text-align: left; font-weight: 600; color: #333;">${this.escapeHtml(h)}</th>`).join('')}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${priorityTable.slice(1).map(row => `<tr style="border-bottom: 1px solid #eee;">
-                                    ${row.map(cell => `<td style="padding: 8px;">${this.escapeHtml(cell)}</td>`).join('')}
-                                </tr>`).join('')}
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>`;
-            }
             
             if (uniqueMitres.length > 0) {
                 rows += `<tr style="border-bottom: 1px solid #ddd;">
@@ -909,16 +861,8 @@ if (html) {
         this.setStatus('complete', 'Complete');
         this.downloadBtn.disabled = false;
         
-        this.log('success', 'System', '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        this.log('success', 'System', 'ALL AGENTS COMPLETED SUCCESSFULLY');
-        this.log('success', 'System', '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        this.log('success', 'System', '✓ Collection Agent - Telemetry gathered');
-        this.log('success', 'System', '✓ Observation Agent - System analyzed');
-        this.log('success', 'System', '✓ Threat Agent - Attack surface mapped');
-        this.log('success', 'System', '✓ Detection Agent - Detection rules generated');
-        this.log('success', 'System', '');
-        this.log('info', 'System', 'Review results in Visualizations or Agent Outputs tab.');
-        this.log('info', 'System', 'Download PDF report using the Download Report button.');
+        this.logHeader('ANALYSIS COMPLETE', 'success');
+        this.log('success', 'System', 'Security analysis finished. Review agent outputs and visualizations.');
         
         this.updateFullOutputDisplay();
         
