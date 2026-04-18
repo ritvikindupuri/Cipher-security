@@ -37,10 +37,10 @@ Watch analysis unfold in real-time. Telemetry collection appears command-by-comm
 <h3 align="center">System Architecture Diagram</h3>
 
 <figure>
-<p align="center">
-  <img src="docs/architecture.png" alt="System Architecture Diagram" width="850"/>
-</p>
-<figcaption align="center"><b>Figure 1:</b> System Architecture</figcaption>
+  <p align="center">
+    <img src="docs/architecture.png" alt="System Architecture Diagram" width="850"/>
+  </p>
+  <figcaption><p align="center"><b>Figure 1:</b> System Architecture</p></figcaption>
 </figure>
 
 ### Architecture Explanation
