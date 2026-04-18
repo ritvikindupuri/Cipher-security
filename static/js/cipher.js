@@ -689,20 +689,41 @@ class CipherDashboard {
                     <td style="font-size: 10px;">${detectionRules.length} rules</td>
                 </tr>
             `).join('');
-        } else {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="4" style="padding: 20px;">
-                        <div style="margin-bottom: 16px;">
-                            <strong style="font-size: 14px; color: #000;">Detection Engineering</strong>
-                        </div>
-                        ${mitres.length > 0 ? `<div style="margin-bottom: 12px;"><span style="color: #666; font-size: 11px;">Techniques to Monitor:</span><br>${mitres.slice(0, 6).map(m => `<span class="mitre-badge" style="margin: 2px;">${m}</span>`).join(' ')}</div>` : ''}
-                        ${detectionRules.length > 0 ? `<div style="margin-bottom: 8px;"><span style="color: #666; font-size: 11px;">Detection Rules Generated:</span> ${detectionRules.length}</div>` : ''}
-                        ${nextSteps.length > 0 ? `<div><span style="color: #666; font-size: 11px;">Recommended Actions:</span><ol style="margin: 8px 0 0 16px; font-size: 11px; color: #333;">${nextSteps.slice(0, 3).map(s => `<li style="color: #333;">${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 80))}</li>`).join('')}</ol></div>` : ''}
-                        <div style="color: #888; font-size: 11px; margin-top: 12px;">View complete detection rules and queries in the Agent Outputs tab.</div>
+        } else if (mitres.length > 0 || detectionRules.length > 0 || nextSteps.length > 0) {
+            let rows = '';
+            
+            if (mitres.length > 0) {
+                rows += `<tr>
+                    <td style="font-weight: 600;">MITRE Techniques</td>
+                    <td colspan="3">${mitres.slice(0, 8).map(m => `<span class="mitre-badge">${m}</span>`).join(' ')}</td>
+                </tr>`;
+            }
+            
+            if (detectionRules.length > 0) {
+                rows += `<tr>
+                    <td style="font-weight: 600;">Detection Rules</td>
+                    <td colspan="3">${detectionRules.length} rules generated</td>
+                </tr>`;
+            }
+            
+            if (nextSteps.length > 0) {
+                rows += `<tr>
+                    <td style="font-weight: 600; vertical-align: top;">Recommended Actions</td>
+                    <td colspan="3">
+                        <ol style="margin: 0; padding-left: 18px; font-size: 12px;">
+                            ${nextSteps.slice(0, 3).map(s => `<li style="margin: 4px 0;">${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 100))}</li>`).join('')}
+                        </ol>
                     </td>
-                </tr>
-            `;
+                </tr>`;
+            }
+            
+            if (rows) {
+                tbody.innerHTML = rows;
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4" style="padding: 20px; text-align: center; color: #666;">View complete detection rules in Agent Outputs tab</td></tr>`;
+            }
+        } else {
+            tbody.innerHTML = `<tr><td colspan="4" style="padding: 20px; text-align: center; color: #666;">Awaiting detection analysis...</td></tr>`;
         }
     }
 
