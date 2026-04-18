@@ -34,6 +34,8 @@ Watch analysis unfold in real-time. Telemetry collection appears command-by-comm
 
 ## System Architecture
 
+<h3 align="center">System Architecture Diagram</h3>
+
 <figure>
 <p align="center">
   <img src="docs/architecture.png" alt="System Architecture Diagram" width="850"/>
@@ -41,23 +43,30 @@ Watch analysis unfold in real-time. Telemetry collection appears command-by-comm
 <figcaption align="center"><b>Figure 1:</b> System Architecture</figcaption>
 </figure>
 
-The system consists of four layers that work sequentially to collect, process, analyze, and report on system telemetry.
+The system follows a sequential flow from raw data collection to AI analysis and dashboard visualization.
 
-**Layer 1: Data Collection**
+**1. Windows System**
 
-The LoggingCollector module uses psutil to execute system calls for cpu_percent, process_iter, net_connections, disk_usage, and virtual_memory. Each command is logged with its timestamp, raw output, execution duration, and success status. Events stream to the dashboard via Server-Sent Events.
+The system begins by extracting raw metrics via OS APIs, capturing essential data points such as CPU, Memory, Disk, Network, and Processes.
 
-**Layer 2: AI Processing**
+**2. LoggingCollector (psutil)**
 
-The Agent Chain sends telemetry to three AI agent instances. Agent 1 (Observations) extracts factual observations from raw data. Agent 2 (Threats) maps attack surface and risks. Agent 3 (Detection Engineering) generates actionable detection rules and SIEM queries. All responses stream token-by-token to the dashboard.
+A Python-based collector leverages `psutil` to execute specific functions (`cpu_percent()`, `process_iter()`, `net_connections()`, `disk_usage()`, and `virtual_memory()`).
 
-**Layer 3: Dashboard Display**
+**3. Telemetry**
 
-Flask hosts the web interface and API endpoints. The Command Log tab displays system commands and raw outputs in terminal format. The Visualizations tab shows charts and data tables. The Agent Outputs tab shows full Claude AI analysis.
+The raw data is structured into telemetry with timestamps and outputs, generating a JSON payload alongside system prompts to feed into the AI layer.
 
-**Layer 4: Report Generation**
+**4. Agent Chain**
 
-ReportLab generates professional PDF reports containing system overview, telemetry summary, threat analysis, MITRE ATT&CK scenarios, and all agent outputs. Reports download after analysis completes.
+The telemetry payload is passed to a chain of specialized AI agents:
+- **Agent 1 - Observation Agent**: Analyzes the raw system telemetry.
+- **Agent 2 - Threat Agent**: Maps the attack surface based on the observations.
+- **Agent 3 - Detection Engineering Agent**: Develops actionable detection rules.
+
+**5. Web Dashboard**
+
+Finally, the system streams the collected system commands and the AI thinking process directly to the Web Dashboard for real-time monitoring and analysis.
 
 ---
 
