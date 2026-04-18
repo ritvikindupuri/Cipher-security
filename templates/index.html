@@ -23,9 +23,9 @@
             --orange: #ff9500;
             
             /* Dark theme for command log */
-            --log-bg: #f5f5f7;
-            --log-text: #1d1d1f;
-            --log-text-dim: #666;
+            --log-bg: #0a0a0f;
+            --log-text: #e0e0e0;
+            --log-text-dim: #888;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -258,11 +258,11 @@
             align-items: center;
             gap: 10px;
             padding: 10px 14px;
-            background: rgba(255,255,255,0.5);
-            border-bottom: 1px solid #eee;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid #222;
         }
         .log-entry:hover {
-            background: rgba(0,0,0,0.02);
+            background: rgba(0,0,0,0.4);
         }
 
         .log-label {
@@ -274,41 +274,24 @@
         }
 
         .log-message {
-            color: #1d1d1f;
+            color: #e0e0e0;
             flex: 1;
             word-break: break-word;
         }
 
-        .log-entry.error .log-message { color: #ff3b30; font-weight: 500; }
-        .log-entry.info .log-message { color: #0071e3; }
-        .log-entry.success .log-message { color: #34c759; }
+        .log-entry.error .log-message { color: #ff6b6b; font-weight: 500; }
         
-        .log-entry.exec .log-message { color: #000; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; font-weight: 600; }
-        .log-entry.output .log-message { color: #0071e3; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
-
-        .log-entry:hover {
-            background: rgba(255,255,255,0.05);
-        }
-
-.log-entry.info { border-left-color: var(--accent); }
+        .log-entry.info { border-left-color: var(--accent); }
         .log-entry.success { border-left-color: var(--success); }
         .log-entry.command { border-left-color: #f59e0b; }
         
-        .log-entry.exec { border-left-color: #10b981; background: #f0fdf4; }
-        .log-entry.exec .log-message { color: #000000; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
+        .log-entry.exec { border-left-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .log-entry.exec .log-message { color: #ffffff; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
         
-        .log-entry.output { border-left-color: #6b7280; background: #f0f9ff; }
+        .log-entry.output { border-left-color: #6b7280; background: rgba(107, 114, 128, 0.1); }
         .log-entry.output .log-message { color: #0071e3; font-family: "SF Mono", "Consolas", monospace; font-size: 12px; }
         
         .log-entry.error { border-left-color: var(--error); background: rgba(239, 68, 68, 0.15); }
-        
-        .log-message {
-            color: var(--log-text);
-            flex: 1;
-            word-break: break-word;
-        }
-
-        .log-entry.error .log-message { color: #ff3b30; font-weight: 500; }
         
         .log-block {
             margin: 12px 0;
