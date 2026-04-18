@@ -142,9 +142,6 @@ class CipherDashboard {
             return `${prefix}${level} <span style="color: #888; font-size: 11px;">(${level} - ${explanation})</span>`;
         });
         
-        html = html.replace(/\n\n+/g, '<br><br>');
-        html = html.replace(/\n/g, '<br>');
-        
         html = html.replace(/^\> (.+)$/gm, '<blockquote>$1</blockquote>');
         
         const tableRows = [];
@@ -165,7 +162,7 @@ class CipherDashboard {
         }
         
         if (tableRows.length > 0) {
-            let tableHtml = '<table><thead>';
+            let tableHtml = '<table class="rendered-table"><thead>';
             if (separatorIndices.length > 0) {
                 tableHtml += '<tr>' + tableRows[0].map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
                 for (let i = separatorIndices[0] + 1; i < tableRows.length; i++) {
@@ -183,6 +180,9 @@ class CipherDashboard {
             html = html.replace(/<\/table>\s*<table>/g, '');
             html += '\n' + tableHtml;
         }
+        
+        html = html.replace(/\n\n+/g, '<br><br>');
+        html = html.replace(/\n/g, '<br>');
         
         html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
         html = html.replace(/(<li>.*<\/li>\s*)+/g, '<ul>$&</ul>');
