@@ -489,24 +489,43 @@ class CipherDashboard {
             document.getElementById('metricNet').textContent = val;
             document.getElementById('chartNet').style.width = Math.min(val, 100) + '%';
             document.getElementById('chartNetVal').textContent = val;
-        } else {
-            const allNumbers = output.match(/\b(\d+)\b/g);
-            if (allNumbers && allNumbers.length > 0) {
-                const likelyConn = allNumbers.find(n => parseInt(n) > 0 && parseInt(n) < 1000);
-                if (likelyConn) {
-                    document.getElementById('metricNet').textContent = likelyConn;
-                    document.getElementById('chartNet').style.width = Math.min(parseInt(likelyConn), 100) + '%';
-                    document.getElementById('chartNetVal').textContent = likelyConn;
-                }
-            }
         }
         
         const processTable = document.getElementById('processTable');
         const processRows = [];
         const lines = output.split('\n');
         let inProcessSection = false;
+        let systemOverview = '';
+        let networkDetails = '';
+        let securityObservations = [];
         
         for (const line of lines) {
+            if (line.match(/## System Overview/i)) {
+                const startIdx = output.indexOf(line);
+                const endMatch = output.indexOf('##', startIdx + 1);
+                if (endMatch > 0) {
+                    systemOverview = output.substring(startIdx, endMatch).replace(/##/g, '').trim();
+                }
+            }
+            
+            if (line.match(/## Network Activity/i) || line.match(/Network Summary/i)) {
+                const startIdx = output.indexOf(line);
+                let endIdx = output.indexOf('##', startIdx + 1);
+                if (endIdx < 0) endIdx = output.indexOf('## Security', startIdx);
+                if (endIdx < 0) endIdx = output.length;
+                networkDetails = output.substring(startIdx, endIdx).replace(/##/g, '').trim();
+            }
+            
+            if (line.match(/## Security Observations/i)) {
+                const startIdx = output.indexOf(line);
+                const endMatch = output.indexOf('##', startIdx + 1);
+                if (endMatch > 0) {
+                    const secSection = output.substring(startIdx, endMatch);
+                    const bulletPoints = secSection.match(/^- (.+)$/gm) || [];
+                    securityObservations = bulletPoints.map(p => p.replace(/^- /, '').trim()).filter(p => p.length > 5);
+                }
+            }
+            
             if (line.match(/Key Processes|Top Process|Process.*Memory/i)) {
                 inProcessSection = true;
                 continue;
@@ -517,6 +536,67 @@ class CipherDashboard {
             
             if (inProcessSection) {
                 const cleanLine = line.replace(/^[\|\-\s]+/, '').trim();
+                if (cleanLine && cleanLine.length > 3) {
+                    const parts = cleanLine.split(/\|/).map(p => p.trim()).filter(p => p);
+                    if (parts.length >= 2) {
+                        let name = parts[0].replace(/\*\*/g, '').trim();
+                        let mem = parts.find(p => p.match(/\d+\s*(MB|GB)/i)) || parts[parts.length - 1];
+                        let pid = parts.find(p => p.match(/^\d{3,5}$/)) || 'N/A';
+                        
+                        if (mem && !mem.match(/\d+\s*(MB|GB)/i)) mem = 'N/A';
+                        
+                        processRows.push(`<tr>
+                            <td class="process-name" style="word-break: break-all; max-width: 150px;">${this.escapeHtml(name)}</td>
+                            <td class="process-pid">${this.escapeHtml(String(pid))}</td>
+                            <td class="process-memory">${this.escapeHtml(mem)}</td>
+                        </tr>`);
+                    }
+                }
+            }
+            
+            if (processRows.length >= 10) break;
+        }
+        
+        let html = '';
+        
+        if (systemOverview) {
+            html += `<div style="margin-bottom: 16px; padding: 12px; background: #f5f5f7; border-radius: 6px;">
+                <div style="font-weight: 600; margin-bottom: 8px; color: #000;">System Overview</div>
+                <div style="font-size: 12px; color: #333; white-space: pre-wrap;">${this.escapeHtml(systemOverview.substring(0, 300))}</div>
+            </div>`;
+        }
+        
+        if (networkDetails) {
+            html += `<div style="margin-bottom: 16px; padding: 12px; background: #f5f5f7; border-radius: 6px;">
+                <div style="font-weight: 600; margin-bottom: 8px; color: #000;">Network Activity</div>
+                <div style="font-size: 12px; color: #333; white-space: pre-wrap;">${this.escapeHtml(networkDetails.substring(0, 300))}</div>
+            </div>`;
+        }
+        
+        if (securityObservations.length > 0) {
+            html += `<div style="margin-bottom: 16px; padding: 12px; background: #fff3cd; border-radius: 6px; border: 1px solid #ffc107;">
+                <div style="font-weight: 600; margin-bottom: 8px; color: #000;">Security Observations</div>
+                <ul style="margin: 0; padding-left: 18px; font-size: 12px; color: #333;">
+                    ${securityObservations.slice(0, 5).map(o => `<li style="margin: 4px 0;">${this.escapeHtml(o.substring(0, 150))}</li>`).join('')}
+                </ul>
+            </div>`;
+        }
+        
+        if (processRows.length > 0) {
+            html += `<table class="process-table" style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+                <thead><tr style="background: #eaeaeb;">
+                    <th style="padding: 8px; text-align: left; font-size: 11px; font-weight: 600; color: #666;">Process</th>
+                    <th style="padding: 8px; text-align: left; font-size: 11px; font-weight: 600; color: #666;">PID</th>
+                    <th style="padding: 8px; text-align: left; font-size: 11px; font-weight: 600; color: #666;">Memory</th>
+                </tr></thead>
+                <tbody>${processRows.join('')}</tbody>
+            </table>`;
+        }
+        
+        if (html) {
+            processTable.innerHTML = html;
+        }
+    }
                 if (cleanLine && cleanLine.length > 3) {
                     const parts = cleanLine.split(/\|/).map(p => p.trim()).filter(p => p);
                     if (parts.length >= 2) {
@@ -612,19 +692,20 @@ class CipherDashboard {
         }
         
         if (threats.length > 0) {
-            threatList.innerHTML = threats.slice(0, 6).map(t => `
-                <div class="attack-item">
-                    <div class="attack-severity ${t.severity}"></div>
-                    <div class="attack-content">
-                        <div class="attack-title">${this.escapeHtml(t.title)}</div>
-                        ${t.evidence ? `<div style="font-size: 11px; color: #666; margin-top: 4px;">${this.escapeHtml(t.evidence.substring(0, 150))}</div>` : ''}
-                        ${t.action ? `<div style="font-size: 10px; color: #0071e3; margin-top: 4px;">Action: ${this.escapeHtml(t.action.substring(0, 100))}</div>` : ''}
-                        ${t.mitre.length > 0 ? '<div style="margin-top: 6px;">' + t.mitre.slice(0, 3).map(m => `<span class="attack-mitre">${m}</span>`).join(' ') + '</div>' : ''}
+            threatList.innerHTML = threats.slice(0, 8).map(t => `
+                <div style="padding: 12px; margin-bottom: 8px; border-radius: 6px; background: ${t.severity === 'high' ? '#ffe6e6' : t.severity === 'medium' ? '#fff3e6' : '#e6f4ea'}; border: 1px solid ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <div class="attack-severity ${t.severity}" style="width: 10px; height: 10px; border-radius: 50%; background: ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};"></div>
+                        <span style="font-size: 10px; font-weight: 600; color: ${t.severity === 'high' ? '#ff3b30' : t.severity === 'medium' ? '#ff9500' : '#34c759'};">${t.severity.toUpperCase()}</span>
                     </div>
+                    <div style="font-weight: 600; font-size: 13px; color: #1d1d1f; margin-bottom: 4px;">${this.escapeHtml(t.title)}</div>
+                    ${t.evidence ? `<div style="font-size: 11px; color: #666; margin-bottom: 4px;"><strong>Evidence:</strong> ${this.escapeHtml(t.evidence.substring(0, 200))}</div>` : ''}
+                    ${t.action ? `<div style="font-size: 11px; color: #0071e3; margin-bottom: 4px;"><strong>Action:</strong> ${this.escapeHtml(t.action.substring(0, 150))}</div>` : ''}
+                    ${t.mitre.length > 0 ? '<div style="margin-top: 6px;">' + t.mitre.slice(0, 4).map(m => `<span class="attack-mitre" style="margin-right: 4px; font-size: 10px; padding: 2px 6px;">${m}</span>`).join('') + '</div>' : ''}
                 </div>
             `).join('');
         } else {
-            threatList.innerHTML = '<div style="color: #666; font-size: 12px;">No significant risks detected. View full analysis in Agent Outputs tab.</div>';
+            threatList.innerHTML = '<div style="color: #666; font-size: 12px; padding: 12px;">No significant risks detected. View full analysis in Agent Outputs tab.</div>';
         }
     }
 
@@ -683,12 +764,14 @@ class CipherDashboard {
         
         if (priorities.length > 0) {
             tbody.innerHTML = priorities.slice(0, 5).map(p => `
-                <tr>
-                    <td style="font-weight: 600;">Priority ${p.priority}</td>
-                    <td>
-                        <div style="font-weight: 600;">${p.technique || '-'}</div>
-                        <div style="font-size: 11px; color: #666;">${p.tactic || ''}</div>
-                        <div style="font-size: 11px; color: #444; margin-top: 4px;">${p.reason ? p.reason.substring(0, 100) : ''}</div>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 12px; font-weight: 600; width: 100px;">
+                        <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; background: ${p.priority === '1' ? '#ff3b30' : p.priority === '2' ? '#ff9500' : '#34c759'}; color: white; font-size: 11px; font-weight: 600;">Priority ${p.priority}</span>
+                    </td>
+                    <td style="padding: 12px;">
+                        <div style="font-weight: 600; font-size: 13px; color: #1d1d1f;">${p.technique || 'Technique not specified'}</div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">${p.tactic || ''}</div>
+                        <div style="font-size: 11px; color: #333; margin-top: 6px; padding: 8px; background: #f5f5f7; border-radius: 4px;">${p.reason ? p.reason.substring(0, 200) : 'No rationale provided'}</div>
                     </td>
                 </tr>
             `).join('');
@@ -696,33 +779,40 @@ class CipherDashboard {
             let rows = '';
             
             if (mitres.length > 0) {
-                rows += `<tr>
-                    <td style="font-weight: 600; background: #f5f5f7;">MITRE ATT&CK Techniques</td>
-                    <td style="background: #f5f5f7;">
-                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                            ${mitres.slice(0, 10).map(m => `<span class="mitre-badge">${m}</span>`).join(' ')}
+                rows += `<tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 12px; font-weight: 600; background: #f5f5f7; color: #1d1d1f;">MITRE ATT&CK Techniques</td>
+                    <td style="padding: 12px; background: #f5f5f7;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+                            ${mitres.slice(0, 12).map(m => `<span style="padding: 4px 10px; background: #eaeaeb; border-radius: 4px; font-size: 11px; font-weight: 600; color: #333;">${m}</span>`).join(' ')}
                         </div>
+                        ${mitres.length > 12 ? `<div style="font-size: 10px; color: #666;">+ ${mitres.length - 12} more techniques</div>` : ''}
                     </td>
                 </tr>`;
             }
             
             if (detectionRules.length > 0) {
-                rows += `<tr>
-                    <td style="font-weight: 600;">Detection Rules</td>
-                    <td>
-                        <strong>${detectionRules.length}</strong> rules available. 
-                        View complete rules in Agent Outputs tab.
-                        ${detectionRules.slice(0, 2).map(r => `<div style="font-size: 11px; color: #666; margin-top: 4px;">• ${this.escapeHtml(r.name || 'Rule')}</div>`).join('')}
+                rows += `<tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 12px; font-weight: 600; color: #1d1d1f;">Detection Rules</td>
+                    <td style="padding: 12px;">
+                        <div style="font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">${detectionRules.length} Rules Generated</div>
+                        ${detectionRules.slice(0, 3).map(r => `
+                            <div style="padding: 8px; margin-bottom: 6px; background: #f0f9ff; border-left: 3px solid #0071e3; border-radius: 4px;">
+                                <div style="font-weight: 600; font-size: 12px; color: #1d1d1f;">${this.escapeHtml(r.name || 'Detection Rule')}</div>
+                                ${r.monitor ? `<div style="font-size: 10px; color: #666; margin-top: 4px;"><strong>Monitor:</strong> ${this.escapeHtml(r.monitor.substring(0, 80))}</div>` : ''}
+                                ${r.condition ? `<div style="font-size: 10px; color: #666; margin-top: 2px;"><strong>Condition:</strong> ${this.escapeHtml(r.condition.substring(0, 80))}</div>` : ''}
+                            </div>
+                        `).join('')}
+                        <div style="font-size: 11px; color: #666; margin-top: 8px;">View all ${detectionRules.length} rules in Agent Outputs tab</div>
                     </td>
                 </tr>`;
             }
             
             if (nextSteps.length > 0) {
                 rows += `<tr>
-                    <td style="font-weight: 600;">Recommended Actions</td>
-                    <td>
-                        <ol style="margin: 0; padding-left: 18px; font-size: 12px; color: #1d1d1f;">
-                            ${nextSteps.slice(0, 5).map(s => `<li style="margin: 6px 0;">${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 150))}</li>`).join('')}
+                    <td style="padding: 12px; font-weight: 600; color: #1d1d1f;">Recommended Actions</td>
+                    <td style="padding: 12px;">
+                        <ol style="margin: 0; padding-left: 20px; font-size: 12px; color: #1d1d1f;">
+                            ${nextSteps.slice(0, 5).map(s => `<li style="margin: 8px 0; padding: 6px; background: #f5f5f7; border-radius: 4px;">${this.escapeHtml(s.replace(/^\d+\.\s*/, '').substring(0, 200))}</li>`).join('')}
                         </ol>
                     </td>
                 </tr>`;
