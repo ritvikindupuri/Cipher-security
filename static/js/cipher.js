@@ -134,6 +134,17 @@ class CipherDashboard {
         html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
         html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
         
+        html = html.replace(/(Severity:\s*)(HIGH|MEDIUM|LOW)/gi, (match, prefix, level) => {
+            let explanation = '';
+            if (level.toUpperCase() === 'HIGH') explanation = 'Significant exposure or critical asset at risk';
+            else if (level.toUpperCase() === 'MEDIUM') explanation = 'Moderate exposure or partial visibility';
+            else if (level.toUpperCase() === 'LOW') explanation = 'Minimal exposure or good controls in place';
+            return `${prefix}${level} <span style="color: #888; font-size: 11px;">(${level} - ${explanation})</span>`;
+        });
+        
+        html = html.replace(/\n\n+/g, '<br><br>');
+        html = html.replace(/\n/g, '<br>');
+        
         html = html.replace(/^\> (.+)$/gm, '<blockquote>$1</blockquote>');
         
         const tableRows = [];
@@ -654,36 +665,52 @@ if (html) {
         }
         
         if (threats.length === 0) {
+            let currentThreat = null;
             for (const line of lines) {
                 const cleanLine = line.replace(/^[\s\-\*\>\#]+/, '').trim();
-                if (cleanLine.match(/HIGH|MEDIUM|LOW/i) && cleanLine.includes(':') && cleanLine.length > 10) {
-                    const sevMatch = cleanLine.match(/severity[:\s]*(\w+)/i);
-                    let severity = 'medium';
-                    let severityReason = 'Severity derived from agent output';
-                    if (sevMatch) {
-                        const sev = sevMatch[1].toUpperCase();
-                        if (sev.includes('HIGH') || sev.includes('CRIT')) {
-                            severity = 'high';
-                            severityReason = 'HIGH severity - exposed attack surface or critical asset';
-                        } else if (sev.includes('MED')) {
-                            severity = 'medium';
-                            severityReason = 'MEDIUM severity - moderate exposure or limited visibility';
-                        } else if (sev.includes('LOW')) {
-                            severity = 'low';
-                            severityReason = 'LOW severity - minimal exposure or good controls present';
-                        }
+                
+                if (cleanLine.match(/Risk:/i) && !cleanLine.match(/Severity:/i)) {
+                    if (currentThreat && currentThreat.title) {
+                        threats.push(currentThreat);
                     }
-                    const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
-                    threats.push({
-                        title: cleanLine,
-                        severity: severity,
-                        severityReason: severityReason,
-                        evidence: '',
-                        mitre: mitres,
-                        action: ''
-                    });
-                    if (threats.length >= 5) break;
+                    const title = cleanLine.replace(/Risk:/i, '').trim();
+                    currentThreat = { title: title, severity: 'medium', severityReason: 'Awaiting analyst severity assessment', evidence: '', mitre: [], action: '' };
                 }
+                
+                if (currentThreat && cleanLine.match(/Severity:/i)) {
+                    const sev = cleanLine.replace(/Severity:/i, '').trim().toUpperCase();
+                    if (sev.includes('HIGH') || sev.includes('CRIT')) {
+                        currentThreat.severity = 'high';
+                        currentThreat.severityReason = 'HIGH severity - exposed attack surface or critical asset';
+                    } else if (sev.includes('LOW')) {
+                        currentThreat.severity = 'low';
+                        currentThreat.severityReason = 'LOW severity - minimal exposure or good controls present';
+                    } else {
+                        currentThreat.severity = 'medium';
+                        currentThreat.severityReason = 'MEDIUM severity - moderate exposure';
+                    }
+                }
+                
+                if (currentThreat && cleanLine.match(/Evidence:/i)) {
+                    currentThreat.evidence = cleanLine.replace(/Evidence:/i, '').trim();
+                }
+                
+                if (currentThreat && cleanLine.match(/Recommended Action:/i)) {
+                    currentThreat.action = cleanLine.replace(/Recommended Action:/i, '').trim();
+                }
+                
+                if (currentThreat && cleanLine.match(/MITRE/i)) {
+                    const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
+                    currentThreat.mitre = mitres;
+                }
+                
+                if (currentThreat && cleanLine.match(/^(Risk Summary|Attack Surface|Honest Assessment|What to Monitor)/i)) {
+                    threats.push(currentThreat);
+                    currentThreat = null;
+                }
+            }
+            if (currentThreat && currentThreat.title) {
+                threats.push(currentThreat);
             }
         }
         
