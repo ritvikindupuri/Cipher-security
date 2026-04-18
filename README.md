@@ -1,4 +1,4 @@
-# Scry
+# Scry - AI-Powered Windows Telemetry & Threat Intelligence Platform
 
 An AI-powered security analysis platform that transforms raw Windows telemetry into actionable threat intelligence.
 
