@@ -340,7 +340,7 @@ class CipherDashboard {
                 <span class="log-label">SYSTEM PROMPT</span>
             </div>
             <div class="log-content prompt-content">
-                <div class="prompt-description">Analysis directives sent to DeepSeek AI:</div>
+                <div class="prompt-description">Analysis directives sent to Claude AI:</div>
                 <pre class="prompt-text">${this.escapeHtml(prompt)}</pre>
             </div>
         `;
@@ -618,7 +618,7 @@ if (html) {
                     threats.push(currentRisk);
                 }
                 const title = cleanLine.replace(/\*\*/g, '').replace(/Risk:/i, '').trim();
-                currentRisk = { title: title, severity: 'medium', severityReason: '', evidence: '', mitre: [], action: '' };
+                currentRisk = { title: title, severity: 'medium', severityReason: 'Awaiting analyst severity assessment', evidence: '', mitre: [], action: '' };
             }
             
             if (currentRisk) {
@@ -629,7 +629,7 @@ if (html) {
                     else if (sev.includes('HIGH')) currentRisk.severityReason = 'High severity based on exposed attack surface or critical asset';
                     else if (sev.includes('MEDIUM') || sev.includes('MED')) currentRisk.severityReason = 'Medium severity - moderate exposure, limited visibility, or partial control';
                     else if (sev.includes('LOW')) currentRisk.severityReason = 'Low severity - minimal exposure, good visibility, or strong controls present';
-                    else currentRisk.severityReason = 'Default severity - no explicit rating provided';
+                    else currentRisk.severityReason = 'MEDIUM severity - moderate exposure (default rating)';
                 }
                 if (cleanLine.match(/\*\*Evidence:\*\*/i)) {
                     currentRisk.evidence = cleanLine.replace(/\*\*/g, '').replace(/Evidence:/i, '').trim();
@@ -659,14 +659,19 @@ if (html) {
                 if (cleanLine.match(/HIGH|MEDIUM|LOW/i) && cleanLine.includes(':') && cleanLine.length > 10) {
                     const sevMatch = cleanLine.match(/severity[:\s]*(\w+)/i);
                     let severity = 'medium';
-                    let severityReason = 'No explicit severity rating provided in output';
+                    let severityReason = 'Severity derived from agent output';
                     if (sevMatch) {
                         const sev = sevMatch[1].toUpperCase();
-                        severity = sev.includes('HIGH') || sev.includes('CRIT') ? 'high' : sev.includes('LOW') ? 'low' : 'medium';
-                        if (sev.includes('CRIT')) severityReason = 'Critical severity explicitly stated';
-                        else if (sev.includes('HIGH')) severityReason = 'High severity based on analyst assessment';
-                        else if (sev.includes('MED') || sev.includes('MEDIUM')) severityReason = 'Medium severity - moderate exposure level';
-                        else if (sev.includes('LOW')) severityReason = 'Low severity - minimal exposure level';
+                        if (sev.includes('HIGH') || sev.includes('CRIT')) {
+                            severity = 'high';
+                            severityReason = 'HIGH severity - exposed attack surface or critical asset';
+                        } else if (sev.includes('MED')) {
+                            severity = 'medium';
+                            severityReason = 'MEDIUM severity - moderate exposure or limited visibility';
+                        } else if (sev.includes('LOW')) {
+                            severity = 'low';
+                            severityReason = 'LOW severity - minimal exposure or good controls present';
+                        }
                     }
                     const mitres = cleanLine.match(/T\d{4}[\.\d]*/g) || [];
                     threats.push({
@@ -684,7 +689,7 @@ if (html) {
         
         const getSeverityTooltip = (t) => {
             let factors = '';
-            let why = t.severityReason || 'No explicit reason provided';
+            let why = t.severityReason || 'Rating derived from Claude analysis';
             if (t.severity === 'high') {
                 factors = 'Exposed network services/ports | Critical system components | Known vulnerable software | Unusual process activity | External network exposure';
             } else if (t.severity === 'medium') {
